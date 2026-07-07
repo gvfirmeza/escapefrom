@@ -90,6 +90,23 @@ export class Entity {
     // Perception constants
     this.sightRange = 15;
     this.hearingRange = 15; // Distance to hear player running/walking
+    
+    // Difficulty
+    this.difficultyMultiplier = 1.0;
+  }
+
+  updateDifficulty(multiplier) {
+    this.difficultyMultiplier = multiplier;
+    this.sightRange = 15 * multiplier;
+    this.hearingRange = 15 * multiplier;
+    
+    if (this.state === STATE.CHASE) {
+      this.speed = this.chaseSpeed * this.difficultyMultiplier;
+    } else if (this.state === STATE.PATROL) {
+      this.speed = 2.0 * this.difficultyMultiplier;
+    } else if (this.state === STATE.INVESTIGATE) {
+      this.speed = 4.0 * this.difficultyMultiplier;
+    }
   }
 
   spawn(position) {
@@ -103,12 +120,12 @@ export class Entity {
     this.stateTimer = 0;
     
     if (this.state === STATE.PATROL) {
-      this.speed = 2.0;
+      this.speed = 2.0 * this.difficultyMultiplier;
       this.generatePatrolPath();
     } else if (this.state === STATE.CHASE) {
-      this.speed = this.chaseSpeed;
+      this.speed = this.chaseSpeed * this.difficultyMultiplier;
     } else if (this.state === STATE.INVESTIGATE) {
-      this.speed = 4.0; // Move faster when investigating sounds
+      this.speed = 4.0 * this.difficultyMultiplier;
     }
   }
 

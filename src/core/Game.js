@@ -74,14 +74,26 @@ export class Game {
 
   onStateChange(newState, oldState) {
     if (newState === GameState.TUTORIAL && oldState === GameState.MAIN_MENU) {
-      this.startNewGame();
+      stateManager.setState(GameState.LOADING);
     }
     
     if (newState === GameState.PLAYING && (oldState === GameState.VICTORY || oldState === GameState.DEFEAT)) {
+      stateManager.setState(GameState.LOADING);
+    }
+    
+    if (newState === GameState.LOADING) {
       this.startNewGame();
+    }
+    
+    if (newState === GameState.PLAYING && oldState === GameState.LOADING) {
       if (this.audioManager) this.audioManager.init();
-    } else if (newState === GameState.PLAYING && oldState === GameState.TUTORIAL) {
-      if (this.audioManager) this.audioManager.init();
+    }
+    
+    if (newState === GameState.MAIN_MENU) {
+      if (this.audioManager && this.audioManager.audioContext) {
+        this.audioManager.audioContext.suspend();
+        this.audioManager.stopMusic();
+      }
     }
     
     if (newState === GameState.PLAYING) {
@@ -106,21 +118,29 @@ export class Game {
     this.keysCollected = 0;
     this.totalKeys = 5;
     this.uiManager.updateKeys(this.keysCollected, this.totalKeys);
+    document.getElementById('find-exit-text').style.display = 'none';
     
-    // Generate new level
-    this.collisionSystem = new CollisionSystem();
-    this.level = new ProceduralLevel(this.collisionSystem, this.sceneManager);
-    this.level.generate(55, 55); // Increased map size
-    // Setup player
-    const spawnPos = this.level.getSpawnPosition();
-    this.player.reset(spawnPos);
-    this.sceneManager.add(this.player.camera);
-    
-    // Setup entity
-    this.entity = new Entity(this.level, this.collisionSystem);
-    const entitySpawn = this.level.getRandomEmptyPositionFarFrom(spawnPos, 15);
-    this.entity.spawn(entitySpawn);
-    this.sceneManager.add(this.entity.mesh);
+    // Defer generation to let the LOADING screen paint on the DOM
+    setTimeout(() => {
+      // Generate new level
+      this.collisionSystem = new CollisionSystem();
+      this.level = new ProceduralLevel(this.collisionSystem, this.sceneManager);
+      this.level.generate(55, 55); // Increased map size
+      
+      // Setup player
+      const spawnPos = this.level.getSpawnPosition();
+      this.player.reset(spawnPos);
+      this.sceneManager.add(this.player.camera);
+      
+      // Setup entity
+      this.entity = new Entity(this.level, this.collisionSystem);
+      const entitySpawn = this.level.getRandomEmptyPositionFarFrom(spawnPos, 15);
+      this.entity.spawn(entitySpawn);
+      this.sceneManager.add(this.entity.mesh);
+      
+      // Transition to playing
+      stateManager.setState(GameState.PLAYING);
+    }, 50); // 50ms is enough for browser to paint the loading screen
   }
 
   update() {
@@ -188,6 +208,17 @@ export class Game {
               
               this.keysCollected++;
               this.uiManager.updateKeys(this.keysCollected, this.totalKeys);
+              
+              if (this.entity) {
+                // Scale difficulty: up to ~1.75x speed/sight/hearing at 5 keys
+                const mult = 1.0 + (this.keysCollected * 0.15);
+                this.entity.updateDifficulty(mult);
+              }
+              
+              if (this.keysCollected >= this.totalKeys) {
+                document.getElementById('find-exit-text').style.display = 'block';
+              }
+              
               if (this.audioManager) {
                 this.audioManager.playKeyPickup();
               }

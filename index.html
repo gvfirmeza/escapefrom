@@ -18,13 +18,16 @@
         <h2>LEVEL 0</h2>
         <div class="menu-content">
           <div class="lang-selector">
-            <label for="lang-select">Language:</label>
-            <select id="lang-select">
-              <option value="pt">Português</option>
-              <option value="en">English</option>
-              <option value="es">Español</option>
-              <option value="fr">Français</option>
-            </select>
+            <label>Language:</label>
+            <div class="custom-select" id="custom-lang-select">
+              <div class="select-selected" id="lang-current">English</div>
+              <div class="select-items select-hide" id="lang-options">
+                <div data-value="pt">Português</div>
+                <div data-value="en">English</div>
+                <div data-value="es">Español</div>
+                <div data-value="fr">Français</div>
+              </div>
+            </div>
           </div>
           <p class="warning" data-i18n="warning">Aviso: Contém luzes piscantes e sons altos.</p>
           <button id="btn-start" data-i18n="start">INICIAR EXPLORAÇÃO</button>
@@ -44,10 +47,17 @@
       </div>
       
       <!-- HUD -->
-      <div id="hud" class="screen">
+      <div id="hud" class="screen hidden" style="background: none; pointer-events: none;">
         <div class="crosshair"></div>
-        <div id="key-counter">Chaves: 0 / 5</div>
+        <div id="stamina-bar-container"><div id="stamina-bar"></div></div>
+        <div id="key-counter">Keys: 0 / 5</div>
         <div id="notification-toast" class="toast hidden">Faltam X chaves</div>
+        <h2 id="find-exit-text" class="pulse-fast" data-i18n="find_exit_obj" style="display: none; position: absolute; bottom: 10%; left: 50%; transform: translateX(-50%); color: red; text-shadow: 2px 0 blue, -2px 0 red, 0 0 10px red;">FIND THE EXIT</h2>
+      </div>
+      
+      <!-- Loading Screen -->
+      <div id="loading-screen" class="screen">
+        <h1 data-i18n="loading" class="pulse">LOADING...</h1>
       </div>
       
       <!-- Tutorial Screen -->
@@ -62,6 +72,7 @@
         <h1 data-i18n="escaped">VOCÊ ESCAPOU</h1>
         <p data-i18n="found_exit">Você achou a saída.</p>
         <button id="btn-restart-win" data-i18n="restart">REINICIAR</button>
+        <button class="btn-menu" data-i18n="return_menu">VOLTAR AO MENU</button>
       </div>
       
       <!-- Defeat Screen -->
@@ -69,6 +80,7 @@
         <h1 data-i18n="caught">VOCÊ FOI PEGO</h1>
         <p data-i18n="it_found_you">Ele te achou.</p>
         <button id="btn-restart-lose" data-i18n="restart">REINICIAR</button>
+        <button class="btn-menu" data-i18n="return_menu">VOLTAR AO MENU</button>
       </div>
 
       <!-- Jumpscare Screen -->
@@ -80,6 +92,7 @@
       <div id="pause-screen" class="screen">
         <h1 data-i18n="paused">PAUSADO</h1>
         <p data-i18n="resume">Clique para voltar.</p>
+        <button class="btn-menu" data-i18n="return_menu" style="margin-top: 5rem; z-index: 10;">VOLTAR AO MENU</button>
       </div>
     </div>
     

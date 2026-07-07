@@ -5,6 +5,7 @@ export class UIManager {
     this.screens = {
       [GameState.MAIN_MENU]: document.getElementById('main-menu'),
       [GameState.TUTORIAL]: document.getElementById('tutorial-screen'),
+      [GameState.LOADING]: document.getElementById('loading-screen'),
       [GameState.PLAYING]: document.getElementById('hud'),
       [GameState.PAUSED]: document.getElementById('pause-screen'),
       [GameState.VICTORY]: document.getElementById('victory-screen'),
@@ -33,8 +34,18 @@ export class UIManager {
       stateManager.setState(GameState.PLAYING);
     });
 
-    document.getElementById('pause-screen').addEventListener('click', () => {
-      stateManager.setState(GameState.PLAYING);
+    document.getElementById('pause-screen').addEventListener('click', (e) => {
+      // Don't unpause if clicking a button
+      if (e.target.tagName !== 'BUTTON') {
+        stateManager.setState(GameState.PLAYING);
+      }
+    });
+
+    // Return to menu buttons
+    document.querySelectorAll('.btn-menu').forEach(btn => {
+      btn.addEventListener('click', () => {
+        stateManager.setState(GameState.MAIN_MENU);
+      });
     });
 
     // Listen to state changes
@@ -64,7 +75,10 @@ export class UIManager {
         paused: "PAUSED",
         resume: "Click to resume.",
         keys: "Keys: {0} / {1}",
-        missing_keys: "You need {0} more keys!"
+        missing_keys: "You need {0} more keys!",
+        loading: "LOADING...",
+        return_menu: "RETURN TO MENU",
+        find_exit_obj: "FIND THE EXIT"
       },
       pt: {
         warning: "Aviso: Contém luzes piscantes e sons altos.",
@@ -85,7 +99,10 @@ export class UIManager {
         paused: "PAUSADO",
         resume: "Clique para voltar.",
         keys: "Chaves: {0} / {1}",
-        missing_keys: "Faltam {0} chaves para abrir a porta!"
+        missing_keys: "Faltam {0} chaves para abrir a porta!",
+        loading: "CARREGANDO...",
+        return_menu: "VOLTAR AO MENU",
+        find_exit_obj: "ENCONTRE A SAÍDA"
       },
       es: {
         warning: "Aviso: Contiene luces intermitentes y sonidos fuertes.",
@@ -106,7 +123,10 @@ export class UIManager {
         paused: "PAUSADO",
         resume: "Haz clic para volver.",
         keys: "Llaves: {0} / {1}",
-        missing_keys: "¡Faltan {0} llaves!"
+        missing_keys: "¡Faltan {0} llaves!",
+        loading: "CARGANDO...",
+        return_menu: "VOLVER AL MENÚ",
+        find_exit_obj: "ENCUENTRA LA SALIDA"
       },
       fr: {
         warning: "Avertissement: Contient des lumières clignotantes et des sons forts.",
@@ -127,15 +147,39 @@ export class UIManager {
         paused: "EN PAUSE",
         resume: "Cliquez pour reprendre.",
         keys: "Clés: {0} / {1}",
-        missing_keys: "Il vous manque {0} clés!"
+        missing_keys: "Il vous manque {0} clés!",
+        loading: "CHARGEMENT...",
+        return_menu: "RETOUR AU MENU",
+        find_exit_obj: "TROUVEZ LA SORTIE"
       }
     };
     
-    this.currentLang = 'pt';
-    const langSelect = document.getElementById('lang-select');
-    if (langSelect) {
-      langSelect.addEventListener('change', (e) => {
-        this.setLanguage(e.target.value);
+    this.currentLang = 'en';
+    const langCurrent = document.getElementById('lang-current');
+    const langOptions = document.getElementById('lang-options');
+    
+    if (langCurrent && langOptions) {
+      // Setup initial text
+      const initialOpt = langOptions.querySelector(`[data-value="${this.currentLang}"]`);
+      if (initialOpt) langCurrent.textContent = initialOpt.textContent;
+      
+      langCurrent.addEventListener('click', (e) => {
+        e.stopPropagation();
+        langOptions.classList.toggle('select-hide');
+      });
+      
+      langOptions.querySelectorAll('div').forEach(opt => {
+        opt.addEventListener('click', (e) => {
+          const val = opt.getAttribute('data-value');
+          langCurrent.textContent = opt.textContent;
+          this.setLanguage(val);
+          langOptions.classList.add('select-hide');
+        });
+      });
+      
+      // Close dropdown when clicking outside
+      document.addEventListener('click', () => {
+        langOptions.classList.add('select-hide');
       });
     }
     

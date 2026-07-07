@@ -1,6 +1,7 @@
 export const GameState = {
   MAIN_MENU: 'MAIN_MENU',
   TUTORIAL: 'TUTORIAL',
+  LOADING: 'LOADING',
   PLAYING: 'PLAYING',
   PAUSED: 'PAUSED',
   VICTORY: 'VICTORY',
