@@ -1,0 +1,88 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>The Backrooms - Level 0</title>
+    <link rel="stylesheet" href="/src/style.css" />
+  </head>
+  <body>
+    <!-- The WebGL Canvas will be injected here or attached to body -->
+    <div id="game-container"></div>
+    
+    <!-- UI Layer -->
+    <div id="ui-layer">
+      <!-- Main Menu -->
+      <div id="main-menu" class="screen active">
+        <h1>THE BACKROOMS</h1>
+        <h2>LEVEL 0</h2>
+        <div class="menu-content">
+          <div class="lang-selector">
+            <label for="lang-select">Language:</label>
+            <select id="lang-select">
+              <option value="pt">Português</option>
+              <option value="en">English</option>
+              <option value="es">Español</option>
+              <option value="fr">Français</option>
+            </select>
+          </div>
+          <p class="warning" data-i18n="warning">Aviso: Contém luzes piscantes e sons altos.</p>
+          <button id="btn-start" data-i18n="start">INICIAR EXPLORAÇÃO</button>
+          
+          <div class="controls-info">
+            <h3>CONTROLS</h3>
+            <ul>
+              <li><strong>WASD</strong>: <span data-i18n="move">Mover</span></li>
+              <li><strong>Mouse</strong>: <span data-i18n="look">Olhar</span></li>
+              <li><strong>Shift</strong>: <span data-i18n="run">Correr</span></li>
+              <li><strong>Ctrl / C</strong>: <span data-i18n="crouch">Agachar</span></li>
+              <li><strong>F</strong>: <span data-i18n="flashlight">Lanterna</span></li>
+              <li><strong>Ctrl + Shift + D</strong>: Debug Mode</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+      
+      <!-- HUD -->
+      <div id="hud" class="screen">
+        <div class="crosshair"></div>
+        <div id="key-counter">Chaves: 0 / 5</div>
+        <div id="notification-toast" class="toast hidden">Faltam X chaves</div>
+      </div>
+      
+      <!-- Tutorial Screen -->
+      <div id="tutorial-screen" class="screen">
+        <h1 data-i18n="objective">OBJETIVO</h1>
+        <p class="tutorial-text" data-i18n="tutorial">Colete 5 chaves e ache a saída.<br>Cuidado.</p>
+        <button id="btn-start-tutorial" data-i18n="understood">ENTENDI</button>
+      </div>
+      
+      <!-- Victory Screen -->
+      <div id="victory-screen" class="screen">
+        <h1 data-i18n="escaped">VOCÊ ESCAPOU</h1>
+        <p data-i18n="found_exit">Você achou a saída.</p>
+        <button id="btn-restart-win" data-i18n="restart">REINICIAR</button>
+      </div>
+      
+      <!-- Defeat Screen -->
+      <div id="defeat-screen" class="screen">
+        <h1 data-i18n="caught">VOCÊ FOI PEGO</h1>
+        <p data-i18n="it_found_you">Ele te achou.</p>
+        <button id="btn-restart-lose" data-i18n="restart">REINICIAR</button>
+      </div>
+
+      <!-- Jumpscare Screen -->
+      <div id="jumpscare-screen" class="screen">
+        <img src="/jumpscare.png" class="jumpscare-image" alt="Jumpscare" />
+      </div>
+      
+      <!-- Pause Screen -->
+      <div id="pause-screen" class="screen">
+        <h1 data-i18n="paused">PAUSADO</h1>
+        <p data-i18n="resume">Clique para voltar.</p>
+      </div>
+    </div>
+    
+    <script type="module" src="/src/main.js"></script>
+  </body>
+</html>
