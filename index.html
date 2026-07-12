@@ -2,7 +2,7 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
     <title>The Backrooms - Level 0</title>
     <link rel="stylesheet" href="/src/style.css" />
   </head>
@@ -115,13 +115,15 @@
       <!-- Rotate Screen -->
       <div id="rotate-screen" class="screen">
         <div class="phone-icon"></div>
-        <h2 style="color: white; margin-top: 2rem;">POR FAVOR, GIRE A TELA</h2>
+        <h2 style="color: white; margin-top: 2rem;" data-i18n="rotate_screen">PLEASE ROTATE YOUR DEVICE</h2>
       </div>
     </div>
     
     <!-- Mobile Controls (hidden by default) -->
     <div id="mobile-controls" style="display: none;">
-      <button id="btn-mobile-pause" style="position: absolute; top: 20px; left: 20px; width: 50px; height: 50px; border-radius: 50%; background: rgba(255,255,255,0.2); border: 2px solid rgba(255,255,255,0.5); color: white; font-weight: bold; pointer-events: auto; z-index: 100;">II</button>
+      <button id="btn-mobile-pause" style="position: absolute; top: 20px; left: 20px; width: 50px; height: 50px; min-width: 50px; min-height: 50px; flex-shrink: 0; border-radius: 50%; background: rgba(255,255,255,0.2); border: 2px solid rgba(255,255,255,0.5); color: white; display: flex; align-items: center; justify-content: center; pointer-events: auto; z-index: 100; padding: 0;">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor"><rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/></svg>
+      </button>
       <div id="camera-zone"></div>
       <div id="joystick-zone">
         <div id="joystick-base">
@@ -129,10 +131,18 @@
         </div>
       </div>
       <div id="action-buttons">
-        <button id="btn-mobile-interact" class="mobile-btn">E</button>
-        <button id="btn-mobile-run" class="mobile-btn">RUN</button>
-        <button id="btn-mobile-crouch" class="mobile-btn">CRCH</button>
-        <button id="btn-mobile-flashlight" class="mobile-btn">FL</button>
+        <button id="btn-mobile-interact" class="mobile-btn">
+          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 11V6a2 2 0 0 0-4 0v4"/><path d="M14 10V4a2 2 0 0 0-4 0v6"/><path d="M10 10.5V3a2 2 0 0 0-4 0v9"/><path d="M6 12v-1a2 2 0 0 0-4 0v5c0 3.9 3.1 7 7 7h2c3.9 0 7-3.1 7-7v-3a2 2 0 0 0-4 0"/></svg>
+        </button>
+        <button id="btn-mobile-run" class="mobile-btn">
+          <svg width="28" height="28" viewBox="0 0 24 24" fill="currentColor" stroke="none"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+        </button>
+        <button id="btn-mobile-crouch" class="mobile-btn">
+          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 6l5 5 5-5"/><path d="M7 13l5 5 5-5"/></svg>
+        </button>
+        <button id="btn-mobile-flashlight" class="mobile-btn">
+          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6c0 2-2 2-2 4v10a2 2 0 0 1-2 2h-4a2 2 0 0 1-2-2V10c0-2-2-2-2-4V2h12v4Z"/><path d="M6 6h12"/><path d="M12 12h.01"/></svg>
+        </button>
       </div>
     </div>
     

@@ -182,16 +182,14 @@ button:hover {
 }
 
 .lang-selector {
-  position: absolute;
-  top: 80px;
-  left: 80px;
   font-size: 1.2rem;
   display: flex;
   flex-direction: column;
-  align-items: flex-start;
+  align-items: center;
   gap: 0.5rem;
   z-index: 100;
   text-shadow: 0 0 10px rgba(209, 184, 46, 0.5);
+  margin-bottom: 2rem;
 }
 
 /* Custom Select */
@@ -498,28 +496,54 @@ body.safe-mode #find-exit-text {
 
 #action-buttons {
   position: absolute;
-  bottom: 40px;
-  right: 40px;
-  display: flex;
-  gap: 15px;
+  bottom: 30px;
+  right: 30px;
+  width: 150px;
+  height: 150px;
   pointer-events: auto;
+}
+
+#btn-mobile-interact {
+  position: absolute;
+  top: 0;
+  left: 45px;
+}
+
+#btn-mobile-run {
+  position: absolute;
+  top: 45px;
+  left: 0;
+}
+
+#btn-mobile-flashlight {
+  position: absolute;
+  top: 45px;
+  right: 0;
+}
+
+#btn-mobile-crouch {
+  position: absolute;
+  bottom: 0;
+  left: 45px;
 }
 
 .mobile-btn {
   width: 60px;
   height: 60px;
+  min-width: 60px;
+  min-height: 60px;
+  flex-shrink: 0;
   border-radius: 50%;
   background: rgba(255, 255, 255, 0.1);
   border: 2px solid rgba(255, 255, 255, 0.3);
   color: white;
-  font-family: 'Courier New', Courier, monospace;
-  font-weight: bold;
-  font-size: 0.9rem;
   display: flex;
   align-items: center;
   justify-content: center;
   user-select: none;
   touch-action: none;
+  padding: 0 !important;
+  margin: 0 !important;
 }
 
 .mobile-btn:active {
@@ -537,9 +561,98 @@ body.safe-mode #find-exit-text {
   opacity: 1;
 }
 
+@media screen and (max-width: 900px) {
+  h1 {
+    font-size: 3rem;
+    letter-spacing: 4px;
+  }
+  h2 {
+    font-size: 1.5rem;
+    letter-spacing: 6px;
+  }
+  .lang-selector {
+    margin-bottom: 1rem;
+  }
+  .select-items {
+    align-items: center;
+  }
+  .menu-content {
+    max-width: 95%;
+    max-height: 100vh;
+    overflow-y: auto;
+    padding: 0.5rem;
+  }
+  .controls-info {
+    display: none; /* Hide controls text on mobile */
+  }
+  #rotate-screen h2 {
+    letter-spacing: 5px;
+    text-align: center;
+    padding: 0 1rem;
+  }
+}
+
+/* Landscape Mobile Fixes (put things in corners to save vertical space) */
+@media screen and (max-height: 500px) and (orientation: landscape) {
+  h1 {
+    font-size: 2.5rem;
+    margin-bottom: 0.2rem;
+  }
+  h2 {
+    font-size: 1.2rem;
+    margin-bottom: 0.5rem;
+  }
+  
+  .lang-selector {
+    position: fixed;
+    top: 15px;
+    right: 20px;
+    flex-direction: row;
+    margin: 0;
+    align-items: center;
+  }
+  .lang-selector label {
+    display: none;
+  }
+  .select-items {
+    align-items: flex-end;
+  }
+  
+  .settings {
+    position: fixed !important;
+    bottom: 15px;
+    left: 20px;
+    align-items: flex-start !important;
+    margin: 0 !important;
+  }
+  
+  .warning {
+    position: fixed;
+    bottom: 15px;
+    right: 20px;
+    max-width: 250px;
+    font-size: 0.75rem !important;
+    text-align: right !important;
+    margin: 0 !important;
+  }
+  
+  button {
+    margin-top: 1.5rem;
+    padding: 0.8rem 3rem;
+    font-size: 1.2rem;
+  }
+  
+  .menu-content {
+    overflow: visible;
+  }
+}
+
 @media screen and (max-width: 900px) and (orientation: portrait) {
   #rotate-screen {
     display: flex !important;
+    opacity: 1 !important;
+    visibility: visible !important;
+    pointer-events: auto !important;
   }
 }
 
@@ -566,6 +679,6 @@ body.safe-mode #find-exit-text {
 
 @keyframes rotatePhone {
   0% { transform: rotate(0deg); }
-  50% { transform: rotate(-90deg); }
-  100% { transform: rotate(-90deg); }
+  50% { transform: rotate(90deg); }
+  100% { transform: rotate(90deg); }
 }

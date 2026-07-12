@@ -97,7 +97,8 @@ export class UIManager {
         return_menu: "RETURN TO MENU",
         find_exit_obj: "FIND THE EXIT",
         enable_jumpscares: "Enable Jumpscares",
-        enable_flashing: "Enable Flashing Lights"
+        enable_flashing: "Enable Flashing Lights",
+        rotate_screen: "PLEASE ROTATE YOUR DEVICE"
       },
       pt: {
         warning: "Aviso: Contém luzes piscantes e sons altos.",
@@ -128,7 +129,8 @@ export class UIManager {
         return_menu: "VOLTAR AO MENU",
         find_exit_obj: "ENCONTRE A SAÍDA",
         enable_jumpscares: "Ativar Jumpscares",
-        enable_flashing: "Ativar Luzes Piscantes"
+        enable_flashing: "Ativar Luzes Piscantes",
+        rotate_screen: "POR FAVOR, GIRE A TELA"
       },
       es: {
         warning: "Aviso: Contiene luces intermitentes y sonidos fuertes.",
@@ -159,7 +161,8 @@ export class UIManager {
         return_menu: "VOLVER AL MENÚ",
         find_exit_obj: "ENCUENTRA LA SALIDA",
         enable_jumpscares: "Activar Jumpscares",
-        enable_flashing: "Activar Luces Parpadeantes"
+        enable_flashing: "Activar Luces Parpadeantes",
+        rotate_screen: "POR FAVOR, GIRE LA PANTALLA"
       },
       fr: {
         warning: "Avertissement: Contient des lumières clignotantes et des sons forts.",
@@ -190,7 +193,8 @@ export class UIManager {
         return_menu: "RETOUR AU MENU",
         find_exit_obj: "TROUVEZ LA SORTIE",
         enable_jumpscares: "Activer Jumpscares",
-        enable_flashing: "Activer Lumières Clignotantes"
+        enable_flashing: "Activer Lumières Clignotantes",
+        rotate_screen: "VEUILLEZ TOURNER L'ÉCRAN"
       }
     };
     
