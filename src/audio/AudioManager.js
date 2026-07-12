@@ -141,32 +141,75 @@ export class AudioManager {
     this.ambientNodes.push({ osc, gain });
   }
 
-  playFootstep(isEnemy, isRunning, volScale = 1.0) {
+  playFootstep(isEnemy, isRunning, volScale = 1.0, levelIndex = 1) {
     if (!this.isInitialized || !this.noiseBuffer) return;
+    
+    if (isEnemy && levelIndex === 2) {
+      this.playHeavyFootstep(volScale);
+      return;
+    }
     
     const source = this.audioContext.createBufferSource();
     source.buffer = this.noiseBuffer;
     
     const filter = this.audioContext.createBiquadFilter();
     filter.type = 'lowpass';
-    // Enemy has heavier (lower) steps, player has higher
-    filter.frequency.value = isEnemy ? 150 : 300; 
+    
+    if (isEnemy) {
+      if (levelIndex === 2) {
+        filter.frequency.value = 800; // increased significantly to ensure visibility on all speakers
+      } else {
+        filter.frequency.value = 150;
+      }
+    } else {
+      filter.frequency.value = 300;
+    }
     
     const gain = this.audioContext.createGain();
     const baseVol = isEnemy ? (isRunning ? 1.0 : 0.5) : (isRunning ? 0.3 : 0.15);
-    const vol = baseVol * volScale;
+    const vol = Math.max(0.01, baseVol * volScale);
     
     // Sharp attack and quick decay for a "step" sound
     gain.gain.setValueAtTime(0, this.audioContext.currentTime);
     gain.gain.linearRampToValueAtTime(vol, this.audioContext.currentTime + 0.01);
-    gain.gain.exponentialRampToValueAtTime(0.001, this.audioContext.currentTime + 0.15);
+    
+    if (isEnemy && levelIndex === 2) {
+      // longer decay for pool rooms echo
+      gain.gain.exponentialRampToValueAtTime(0.001, this.audioContext.currentTime + 0.5);
+      source.stop(this.audioContext.currentTime + 0.6);
+    } else {
+      gain.gain.exponentialRampToValueAtTime(0.001, this.audioContext.currentTime + 0.15);
+      source.stop(this.audioContext.currentTime + 0.2);
+    }
     
     source.connect(filter);
     filter.connect(gain);
     gain.connect(this.audioContext.destination);
     
     source.start();
-    source.stop(this.audioContext.currentTime + 0.2);
+  }
+
+  playHeavyFootstep(volScale) {
+    const osc = this.audioContext.createOscillator();
+    const gain = this.audioContext.createGain();
+    
+    osc.type = 'sine'; // Deep thump
+    
+    // Pitch envelope (kick drum effect)
+    osc.frequency.setValueAtTime(150, this.audioContext.currentTime);
+    osc.frequency.exponentialRampToValueAtTime(10, this.audioContext.currentTime + 0.3);
+    
+    // Volume envelope
+    const vol = Math.max(0.01, 1.5 * volScale);
+    gain.gain.setValueAtTime(0, this.audioContext.currentTime);
+    gain.gain.linearRampToValueAtTime(vol, this.audioContext.currentTime + 0.02);
+    gain.gain.exponentialRampToValueAtTime(0.001, this.audioContext.currentTime + 0.6);
+    
+    osc.connect(gain);
+    gain.connect(this.audioContext.destination);
+    
+    osc.start();
+    osc.stop(this.audioContext.currentTime + 0.7);
   }
 
   playClick() {
@@ -189,22 +232,28 @@ export class AudioManager {
     osc.stop(this.audioContext.currentTime + 0.05);
   }
 
-  updateEnemyAudio(delta, isMoving, isChasing, distToEnemy) {
+  updateEnemyAudio(delta, isMoving, isChasing, distToEnemy, levelIndex = 1) {
     if (!this.isInitialized) return;
     
-    if (distToEnemy > 18) return; // Silent if far away
+    const maxDist = levelIndex === 2 ? 60 : 35;
+    
+    if (distToEnemy > maxDist) return; // Silent if far away
     
     if (isMoving) {
       const speedMultiplier = isChasing ? 2.5 : 1.2;
       const prevPhase = this.enemyStepPhase;
       this.enemyStepPhase += delta * speedMultiplier * 4;
       
-      // Volume scales down as distance approaches 18
-      const volScale = Math.max(0, 1.0 - (distToEnemy / 18));
+      // Volume scales down as distance approaches maxDist
+      let volScale = Math.max(0, 1.0 - (distToEnemy / maxDist));
+      
+      if (levelIndex === 2) {
+         volScale *= 2.0; // Boost volume so it's very clear in phase 2
+      }
       
       // Trigger step every time phase crosses an integer
       if (Math.floor(this.enemyStepPhase) > Math.floor(prevPhase)) {
-        this.playFootstep(true, isChasing, volScale);
+        this.playFootstep(true, isChasing, volScale, levelIndex);
       }
     }
   }
@@ -252,14 +301,53 @@ export class AudioManager {
       
       osc.connect(gain);
       gain.connect(this.audioContext.destination);
-      
       osc.start();
       osc.stop(this.audioContext.currentTime + 0.5);
     }
   }
 
-  updateMusic(distToEnemy) {
+  playValveTurn() {
+    if (!this.isInitialized) return;
+    
+    // Create a metallic grinding/rusty noise
+    const osc = this.audioContext.createOscillator();
+    const gain = this.audioContext.createGain();
+    
+    osc.type = 'sawtooth';
+    osc.frequency.setValueAtTime(100, this.audioContext.currentTime);
+    osc.frequency.linearRampToValueAtTime(50, this.audioContext.currentTime + 1.0);
+    
+    // Add distortion for rustiness
+    const dist = this.audioContext.createWaveShaper();
+    dist.curve = this.makeDistortionCurve(400); // Heavy distortion
+    
+    // Filter out high frequencies
+    const filter = this.audioContext.createBiquadFilter();
+    filter.type = 'lowpass';
+    filter.frequency.value = 800;
+    
+    gain.gain.setValueAtTime(0, this.audioContext.currentTime);
+    gain.gain.linearRampToValueAtTime(0.3, this.audioContext.currentTime + 0.1);
+    gain.gain.exponentialRampToValueAtTime(0.01, this.audioContext.currentTime + 1.0);
+    
+    osc.connect(dist);
+    dist.connect(filter);
+    filter.connect(gain);
+    gain.connect(this.audioContext.destination);
+    
+    osc.start();
+    osc.stop(this.audioContext.currentTime + 1.0);
+  }
+
+  updateMusic(distToEnemy, levelIndex = 1) {
     if (!this.musicGain || !this.musicSource || !this.musicDistortion) return;
+    
+    if (levelIndex === 2) {
+      // Silence music for phase 2
+      this.musicGain.gain.setTargetAtTime(0.001, this.audioContext.currentTime, 0.5);
+      this.musicDistortion.curve = null;
+      return;
+    }
     
     // Start playing when closer than 25 units (music range is larger than footstep range)
     const maxDist = 25;

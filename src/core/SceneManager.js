@@ -4,15 +4,25 @@ export class SceneManager {
   constructor() {
     this.scene = new THREE.Scene();
     
-    // Classic Backrooms fog but darker
-    this.scene.background = new THREE.Color('#0a0a00'); // Darker yellow/green
+    // Default Backrooms fog
+    this.scene.background = new THREE.Color('#0a0a00');
     this.scene.fog = new THREE.FogExp2('#0a0a00', 0.05);
     
     this.setupLighting();
   }
 
+  setupPoolRoomsEnvironment() {
+    this.scene.background = new THREE.Color('#3a5a5a');
+    this.scene.fog = new THREE.FogExp2('#3a5a5a', 0.035);
+    
+    this.ambientLight = new THREE.AmbientLight('#88bbbb', 0.3);
+    this.scene.add(this.ambientLight);
+  }
+
   setupLighting() {
-    // Ambient light - increased slightly as requested
+    this.scene.background = new THREE.Color('#0a0a00');
+    this.scene.fog = new THREE.FogExp2('#0a0a00', 0.05);
+    
     this.ambientLight = new THREE.AmbientLight('#fffad6', 0.04);
     this.scene.add(this.ambientLight);
   }
@@ -36,14 +46,11 @@ export class SceneManager {
   }
 
   clear() {
-    // Clear everything except lights
-    const toRemove = [];
-    this.scene.children.forEach(child => {
-      if (!(child instanceof THREE.Light)) {
-        toRemove.push(child);
-      }
+    // Clear EVERYTHING to prevent memory/performance leaks with lights across restarts
+    const toRemove = [...this.scene.children];
+    toRemove.forEach(child => {
+      this.scene.remove(child);
+      if (child.dispose) child.dispose();
     });
-    
-    toRemove.forEach(child => this.scene.remove(child));
   }
 }

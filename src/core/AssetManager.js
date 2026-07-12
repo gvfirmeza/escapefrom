@@ -10,31 +10,64 @@ export class AssetManager {
 
   init() {
     this.generateTextures();
+    this.generatePoolTextures();
     this.createMaterials();
   }
 
   async loadModels() {
     return new Promise((resolve) => {
       const loader = new GLTFLoader();
+      
+      let loaded1 = false;
+      let loaded2 = false;
+      
+      const checkDone = () => {
+        if (loaded1 && loaded2) resolve();
+      };
+      
       loader.load('/tung_tung_tung_sahur/scene.gltf', (gltf) => {
         const model = gltf.scene;
-        
-        // Configure shadows and materials if necessary
         model.traverse((child) => {
           if (child.isMesh) {
             child.castShadow = true;
             child.receiveShadow = true;
           }
         });
-        
         this.models.enemy = model;
-        this.models.enemy.animations = gltf.animations; // Store animations on the object
-        resolve();
+        this.models.enemy.animations = gltf.animations;
+        loaded1 = true;
+        checkDone();
       }, undefined, (err) => {
-        console.error('Failed to load tung_tung_tung_sahur model, falling back to procedural:', err);
-        resolve();
+        loaded1 = true;
+        checkDone();
+      });
+      
+      loader.load('/tralalero_tralala/scene.gltf', (gltf) => {
+        const model = gltf.scene;
+        model.traverse((child) => {
+          if (child.isMesh) {
+            child.castShadow = true;
+            child.receiveShadow = true;
+          }
+        });
+        this.models.enemy2 = model;
+        this.models.enemy2.animations = gltf.animations;
+        loaded2 = true;
+        checkDone();
+      }, undefined, (err) => {
+        loaded2 = true;
+        checkDone();
       });
     });
+  }
+
+  getModel(name) {
+    if (this.models[name]) {
+      const clone = this.models[name].clone();
+      clone.animations = this.models[name].animations;
+      return clone;
+    }
+    return null;
   }
 
   generateTextures() {
@@ -124,6 +157,49 @@ export class AssetManager {
     this.textures.ceiling.wrapT = THREE.RepeatWrapping;
   }
 
+  generatePoolTextures() {
+    // Pool Tiles (White with cyan grout)
+    const tileCanvas = document.createElement('canvas');
+    tileCanvas.width = 256;
+    tileCanvas.height = 256;
+    const tileCtx = tileCanvas.getContext('2d');
+    
+    // Base white
+    tileCtx.fillStyle = '#f0f5f5';
+    tileCtx.fillRect(0, 0, 256, 256);
+    
+    // Grid lines (Cyan/blue grout)
+    tileCtx.strokeStyle = '#aadddd';
+    tileCtx.lineWidth = 4;
+    
+    // Draw 8x8 grid of smaller tiles
+    const tileSize = 32;
+    tileCtx.beginPath();
+    for (let i = 0; i <= 256; i += tileSize) {
+      tileCtx.moveTo(i, 0);
+      tileCtx.lineTo(i, 256);
+      tileCtx.moveTo(0, i);
+      tileCtx.lineTo(256, i);
+    }
+    tileCtx.stroke();
+    
+    // Subtle noise
+    const imgData = tileCtx.getImageData(0, 0, 256, 256);
+    for (let i = 0; i < imgData.data.length; i += 4) {
+      const noise = (Math.random() - 0.5) * 5;
+      imgData.data[i] += noise;
+      imgData.data[i + 1] += noise;
+      imgData.data[i + 2] += noise;
+    }
+    tileCtx.putImageData(imgData, 0, 0);
+    
+    this.textures.poolTile = new THREE.CanvasTexture(tileCanvas);
+    this.textures.poolTile.wrapS = THREE.RepeatWrapping;
+    this.textures.poolTile.wrapT = THREE.RepeatWrapping;
+    // Repeat more densely
+    this.textures.poolTile.repeat.set(4, 4);
+  }
+
   createMaterials() {
     this.materials.wall = new THREE.MeshStandardMaterial({
       map: this.textures.wall,
@@ -148,6 +224,21 @@ export class AssetManager {
       roughness: 0.2,
       metalness: 0.8,
       emissive: 0x220000
+    });
+    
+    this.materials.poolTile = new THREE.MeshStandardMaterial({
+      map: this.textures.poolTile,
+      roughness: 0.1, // Shiny tiles
+      metalness: 0.1,
+      color: 0xffffff
+    });
+    
+    this.materials.water = new THREE.MeshStandardMaterial({
+      color: 0x00aaff,
+      opacity: 0.6,
+      roughness: 0.1,
+      metalness: 0.1,
+      transparent: true
     });
   }
 

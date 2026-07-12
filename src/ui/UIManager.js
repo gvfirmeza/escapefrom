@@ -51,6 +51,18 @@ export class UIManager {
     // Listen to state changes
     stateManager.addListener(this.onStateChange.bind(this));
     
+    // Toggle flashing lights
+    const flashToggle = document.getElementById('toggle-flashing');
+    if (flashToggle) {
+      flashToggle.addEventListener('change', (e) => {
+        if (!e.target.checked) {
+          document.body.classList.add('safe-mode');
+        } else {
+          document.body.classList.remove('safe-mode');
+        }
+      });
+    }
+    
     // Initial sync
     this.updateScreens(stateManager.getState());
     
@@ -66,7 +78,10 @@ export class UIManager {
         flashlight: "Flashlight",
         objective: "OBJECTIVE",
         tutorial: "Collect 5 keys and find the exit.<br>Beware.",
+        tutorial_l2: "Turn 5 valves to drain the pool.<br>Don't look away.",
         understood: "UNDERSTOOD",
+        interact: "Interact",
+        interact_prompt: "[E] INTERACT",
         escaped: "YOU ESCAPED",
         found_exit: "You have found the exit.",
         restart: "RESTART",
@@ -76,9 +91,13 @@ export class UIManager {
         resume: "Click to resume.",
         keys: "Keys: {0} / {1}",
         missing_keys: "You need {0} more keys!",
+        valves: "Valves: {0} / {1}",
+        missing_valves: "You need {0} more valves!",
         loading: "LOADING...",
         return_menu: "RETURN TO MENU",
-        find_exit_obj: "FIND THE EXIT"
+        find_exit_obj: "FIND THE EXIT",
+        enable_jumpscares: "Enable Jumpscares",
+        enable_flashing: "Enable Flashing Lights"
       },
       pt: {
         warning: "Aviso: Contém luzes piscantes e sons altos.",
@@ -90,7 +109,10 @@ export class UIManager {
         flashlight: "Lanterna",
         objective: "OBJETIVO",
         tutorial: "Colete 5 chaves e ache a saída.<br>Cuidado.",
+        tutorial_l2: "Gire 5 válvulas para esvaziar a piscina.<br>Não olhe para trás.",
         understood: "ENTENDI",
+        interact: "Interagir",
+        interact_prompt: "[E] INTERAGIR",
         escaped: "VOCÊ ESCAPOU",
         found_exit: "Você achou a saída.",
         restart: "REINICIAR",
@@ -100,9 +122,13 @@ export class UIManager {
         resume: "Clique para voltar.",
         keys: "Chaves: {0} / {1}",
         missing_keys: "Faltam {0} chaves para abrir a porta!",
+        valves: "Válvulas: {0} / {1}",
+        missing_valves: "Faltam {0} válvulas para esvaziar a piscina!",
         loading: "CARREGANDO...",
         return_menu: "VOLTAR AO MENU",
-        find_exit_obj: "ENCONTRE A SAÍDA"
+        find_exit_obj: "ENCONTRE A SAÍDA",
+        enable_jumpscares: "Ativar Jumpscares",
+        enable_flashing: "Ativar Luzes Piscantes"
       },
       es: {
         warning: "Aviso: Contiene luces intermitentes y sonidos fuertes.",
@@ -114,7 +140,10 @@ export class UIManager {
         flashlight: "Linterna",
         objective: "OBJETIVO",
         tutorial: "Recoge 5 llaves y encuentra la salida.<br>Cuidado.",
+        tutorial_l2: "Gira 5 válvulas para vaciar la piscina.<br>No apartes la mirada.",
         understood: "ENTENDIDO",
+        interact: "Interactuar",
+        interact_prompt: "[E] INTERACTUAR",
         escaped: "ESCAPASTE",
         found_exit: "Has encontrado la salida.",
         restart: "REINICIAR",
@@ -124,9 +153,13 @@ export class UIManager {
         resume: "Haz clic para volver.",
         keys: "Llaves: {0} / {1}",
         missing_keys: "¡Faltan {0} llaves!",
+        valves: "Válvulas: {0} / {1}",
+        missing_valves: "¡Faltan {0} válvulas!",
         loading: "CARGANDO...",
         return_menu: "VOLVER AL MENÚ",
-        find_exit_obj: "ENCUENTRA LA SALIDA"
+        find_exit_obj: "ENCUENTRA LA SALIDA",
+        enable_jumpscares: "Activar Jumpscares",
+        enable_flashing: "Activar Luces Parpadeantes"
       },
       fr: {
         warning: "Avertissement: Contient des lumières clignotantes et des sons forts.",
@@ -138,7 +171,10 @@ export class UIManager {
         flashlight: "Lampe de poche",
         objective: "OBJECTIF",
         tutorial: "Trouvez 5 clés et la sortie.<br>Attention.",
+        tutorial_l2: "Tournez 5 vannes pour vider la piscine.<br>Ne détournez pas le regard.",
         understood: "COMPRIS",
+        interact: "Interagir",
+        interact_prompt: "[E] INTERAGIR",
         escaped: "VOUS VOUS ÊTES ÉCHAPPÉ",
         found_exit: "Vous avez trouvé la sortie.",
         restart: "RECOMMENCER",
@@ -148,9 +184,13 @@ export class UIManager {
         resume: "Cliquez pour reprendre.",
         keys: "Clés: {0} / {1}",
         missing_keys: "Il vous manque {0} clés!",
+        valves: "Vannes: {0} / {1}",
+        missing_valves: "Il vous manque {0} vannes!",
         loading: "CHARGEMENT...",
         return_menu: "RETOUR AU MENU",
-        find_exit_obj: "TROUVEZ LA SORTIE"
+        find_exit_obj: "TROUVEZ LA SORTIE",
+        enable_jumpscares: "Activer Jumpscares",
+        enable_flashing: "Activer Lumières Clignotantes"
       }
     };
     
@@ -200,7 +240,7 @@ export class UIManager {
     
     // Update active HUD keys counter if needed
     if (this.lastKeysTotal) {
-      this.updateKeys(this.lastKeysCurrent, this.lastKeysTotal);
+      this.updateKeys(this.lastKeysCurrent, this.lastKeysTotal, this.lastIsLevel2);
     }
   }
 
@@ -218,20 +258,42 @@ export class UIManager {
         }
       }
     }
+    
+    // Manage mobile controls
+    const isMobile = ('ontouchstart' in window) || (navigator.maxTouchPoints > 0);
+    const mobileControls = document.getElementById('mobile-controls');
+    if (mobileControls && isMobile) {
+      if (activeState === GameState.PLAYING) {
+        mobileControls.style.display = 'block';
+      } else {
+        mobileControls.style.display = 'none';
+      }
+    }
   }
   
-  updateKeys(current, total) {
+  updateTutorial(isLevel2) {
+    const tutorialEl = document.querySelector('#tutorial-screen .tutorial-text');
+    if (tutorialEl) {
+      const keyStr = isLevel2 ? 'tutorial_l2' : 'tutorial';
+      tutorialEl.innerHTML = this.translations[this.currentLang][keyStr];
+    }
+  }
+  
+  updateKeys(current, total, isLevel2 = false) {
     this.lastKeysCurrent = current;
     this.lastKeysTotal = total;
+    this.lastIsLevel2 = isLevel2;
     if (this.keyCounter) {
-      const t = this.translations[this.currentLang].keys;
+      const keyStr = isLevel2 ? 'valves' : 'keys';
+      const t = this.translations[this.currentLang][keyStr];
       this.keyCounter.textContent = t.replace('{0}', current).replace('{1}', total);
     }
   }
   
-  showMissingKeysNotification(count) {
+  showMissingKeysNotification(count, isLevel2 = false) {
     if (!this.toast) return;
-    const t = this.translations[this.currentLang].missing_keys;
+    const keyStr = isLevel2 ? 'missing_valves' : 'missing_keys';
+    const t = this.translations[this.currentLang][keyStr];
     this.showNotification(t.replace('{0}', count));
   }
 

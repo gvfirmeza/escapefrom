@@ -66,11 +66,19 @@ export class MovementController {
       speed = this.runSpeed;
     }
 
-    const z = Number(input.keys.s) - Number(input.keys.w);
-    const x = Number(input.keys.d) - Number(input.keys.a);
+    let z = Number(input.keys.s) - Number(input.keys.w);
+    let x = Number(input.keys.d) - Number(input.keys.a);
     
-    this.direction.set(x, 0, z).normalize();
+    // Add joystick input if available
+    if (input.joystickVector && (input.joystickVector.x !== 0 || input.joystickVector.y !== 0)) {
+      x += input.joystickVector.x;
+      z += input.joystickVector.y;
+    }
     
+    this.direction.set(x, 0, z);
+    if (this.direction.lengthSq() > 1) {
+      this.direction.normalize();
+    }
     if (this.isDebugMode) {
       // In debug mode, apply full 3D rotation to direction for flying
       this.direction.applyEuler(this.euler);

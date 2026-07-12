@@ -29,7 +29,21 @@
               </div>
             </div>
           </div>
-          <p class="warning" data-i18n="warning">Aviso: Contém luzes piscantes e sons altos.</p>
+          <p class="warning" data-i18n="warning" style="font-size: 1.5rem; text-align: center; max-width: 600px; margin: 1rem auto; color: #ff5555; text-shadow: 0 0 10px red;">Aviso: Contém luzes piscantes e sons altos.</p>
+          
+          <div class="settings" style="display: flex; flex-direction: column; align-items: center; gap: 0.8rem; margin-bottom: 2rem;">
+            <label class="custom-checkbox">
+              <input type="checkbox" id="toggle-jumpscare" checked>
+              <span class="checkmark"></span>
+              <span data-i18n="enable_jumpscares">Enable Jumpscares</span>
+            </label>
+            <label class="custom-checkbox">
+              <input type="checkbox" id="toggle-flashing" checked>
+              <span class="checkmark"></span>
+              <span data-i18n="enable_flashing">Enable Flashing Lights</span>
+            </label>
+          </div>
+          
           <button id="btn-start" data-i18n="start">INICIAR EXPLORAÇÃO</button>
           
           <div class="controls-info">
@@ -40,6 +54,7 @@
               <li><strong>Shift</strong>: <span data-i18n="run">Correr</span></li>
               <li><strong>Ctrl / C</strong>: <span data-i18n="crouch">Agachar</span></li>
               <li><strong>F</strong>: <span data-i18n="flashlight">Lanterna</span></li>
+              <li><strong>E</strong>: <span data-i18n="interact">Interagir</span></li>
               <li><strong>Ctrl + Shift + D</strong>: Debug Mode</li>
             </ul>
           </div>
@@ -52,6 +67,7 @@
         <div id="stamina-bar-container"><div id="stamina-bar"></div></div>
         <div id="key-counter">Keys: 0 / 5</div>
         <div id="notification-toast" class="toast hidden">Faltam X chaves</div>
+        <div id="interact-prompt" data-i18n="interact_prompt" style="display: none; position: absolute; top: 60%; left: 50%; transform: translateX(-50%); color: white; font-size: 1.5rem; text-shadow: 2px 2px 0 #000;">[E] INTERAGIR</div>
         <h2 id="find-exit-text" class="pulse-fast" data-i18n="find_exit_obj" style="display: none; position: absolute; bottom: 10%; left: 50%; transform: translateX(-50%); color: red; text-shadow: 2px 0 blue, -2px 0 red, 0 0 10px red;">FIND THE EXIT</h2>
       </div>
       
@@ -85,7 +101,8 @@
 
       <!-- Jumpscare Screen -->
       <div id="jumpscare-screen" class="screen">
-        <img src="/jumpscare.png" class="jumpscare-image" alt="Jumpscare" />
+        <img src="/jumpscare.png" class="jumpscare-image" id="jumpscare-img-1" alt="Jumpscare" />
+        <img src="/jumpscare2.png" class="jumpscare-image" id="jumpscare-img-2" alt="Jumpscare" style="display: none;" />
       </div>
       
       <!-- Pause Screen -->
@@ -93,6 +110,22 @@
         <h1 data-i18n="paused">PAUSADO</h1>
         <p data-i18n="resume">Clique para voltar.</p>
         <button class="btn-menu" data-i18n="return_menu" style="margin-top: 5rem; z-index: 10;">VOLTAR AO MENU</button>
+      </div>
+    </div>
+    
+    <!-- Mobile Controls (hidden by default) -->
+    <div id="mobile-controls" style="display: none;">
+      <div id="camera-zone"></div>
+      <div id="joystick-zone">
+        <div id="joystick-base">
+          <div id="joystick-stick"></div>
+        </div>
+      </div>
+      <div id="action-buttons">
+        <button id="btn-mobile-interact" class="mobile-btn">E</button>
+        <button id="btn-mobile-run" class="mobile-btn">RUN</button>
+        <button id="btn-mobile-crouch" class="mobile-btn">CRCH</button>
+        <button id="btn-mobile-flashlight" class="mobile-btn">FL</button>
       </div>
     </div>
     

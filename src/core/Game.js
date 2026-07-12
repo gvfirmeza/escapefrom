@@ -5,8 +5,10 @@ import { assetManager } from './AssetManager.js';
 import { stateManager, GameState } from './StateManager.js';
 import { UIManager } from '../ui/UIManager.js';
 import { ProceduralLevel } from '../world/ProceduralLevel.js';
+import { PoolRoomsLevel } from '../world/PoolRoomsLevel.js';
 import { Player } from '../player/Player.js';
 import { Entity } from '../ai/Entity.js';
+import { SharkEntity } from '../ai/SharkEntity.js';
 import { CollisionSystem } from '../world/CollisionSystem.js';
 import { AudioManager } from '../audio/AudioManager.js';
 
@@ -21,6 +23,7 @@ export class Game {
     this.animationFrameId = null;
     
     // Core gameplay components
+    this.currentLevelIndex = 1;
     this.level = null;
     this.collisionSystem = null;
     this.player = null;
@@ -58,6 +61,19 @@ export class Game {
       }
     };
     
+    // Debug Skip Level
+    this.player.input.onSkipLevel = () => {
+      if (stateManager.getState() === GameState.PLAYING) {
+        if (this.currentLevelIndex === 1) {
+          this.currentLevelIndex = 2;
+          this.uiManager.updateTutorial(true);
+          stateManager.setState(GameState.TUTORIAL);
+        } else {
+          stateManager.setState(GameState.VICTORY);
+        }
+      }
+    };
+    
     // Auto-pause when losing focus
     this.player.input.onUnlock = () => {
       if (stateManager.getState() === GameState.PLAYING) {
@@ -73,11 +89,11 @@ export class Game {
   }
 
   onStateChange(newState, oldState) {
-    if (newState === GameState.TUTORIAL && oldState === GameState.MAIN_MENU) {
-      stateManager.setState(GameState.LOADING);
+    if (newState === GameState.TUTORIAL) {
+      this.uiManager.updateTutorial(this.currentLevelIndex === 2);
     }
-    
-    if (newState === GameState.PLAYING && (oldState === GameState.VICTORY || oldState === GameState.DEFEAT)) {
+
+    if (newState === GameState.PLAYING && (oldState === GameState.VICTORY || oldState === GameState.DEFEAT || oldState === GameState.TUTORIAL)) {
       stateManager.setState(GameState.LOADING);
     }
     
@@ -98,6 +114,10 @@ export class Game {
     
     if (newState === GameState.PLAYING) {
       this.player.lockPointer();
+      // Ensure audio context is running when entering PLAYING state
+      if (this.audioManager && this.audioManager.audioContext && this.audioManager.audioContext.state === 'suspended') {
+        this.audioManager.audioContext.resume();
+      }
     } else {
       this.player.unlockPointer();
     }
@@ -105,27 +125,38 @@ export class Game {
     // Suspend audio when paused
     if (newState === GameState.PAUSED && this.audioManager && this.audioManager.audioContext) {
       this.audioManager.audioContext.suspend();
-    } else if (oldState === GameState.PAUSED && newState === GameState.PLAYING && this.audioManager && this.audioManager.audioContext) {
-      this.audioManager.audioContext.resume();
     }
   }
 
   startNewGame() {
     // Clear old scene
     this.sceneManager.clear();
-    this.sceneManager.setupLighting();
+    
+    const isLevel2 = this.currentLevelIndex === 2;
+    if (isLevel2) {
+      this.sceneManager.setupPoolRoomsEnvironment();
+    } else {
+      this.sceneManager.setupLighting();
+    }
+    
     this.isJumpscareActive = false;
     this.keysCollected = 0;
     this.totalKeys = 5;
-    this.uiManager.updateKeys(this.keysCollected, this.totalKeys);
+    
+    this.uiManager.updateKeys(this.keysCollected, this.totalKeys, isLevel2);
     document.getElementById('find-exit-text').style.display = 'none';
     
     // Defer generation to let the LOADING screen paint on the DOM
     setTimeout(() => {
-      // Generate new level
       this.collisionSystem = new CollisionSystem();
-      this.level = new ProceduralLevel(this.collisionSystem, this.sceneManager);
-      this.level.generate(55, 55); // Increased map size
+      
+      if (isLevel2) {
+        this.level = new PoolRoomsLevel(this.collisionSystem, this.sceneManager);
+        this.level.generate(30, 30);
+      } else {
+        this.level = new ProceduralLevel(this.collisionSystem, this.sceneManager);
+        this.level.generate(55, 55);
+      }
       
       // Setup player
       const spawnPos = this.level.getSpawnPosition();
@@ -133,14 +164,18 @@ export class Game {
       this.sceneManager.add(this.player.camera);
       
       // Setup entity
-      this.entity = new Entity(this.level, this.collisionSystem);
       const entitySpawn = this.level.getRandomEmptyPositionFarFrom(spawnPos, 15);
+      if (isLevel2) {
+        this.entity = new SharkEntity(this.level, this.collisionSystem);
+      } else {
+        this.entity = new Entity(this.level, this.collisionSystem);
+      }
       this.entity.spawn(entitySpawn);
       this.sceneManager.add(this.entity.mesh);
       
       // Transition to playing
       stateManager.setState(GameState.PLAYING);
-    }, 50); // 50ms is enough for browser to paint the loading screen
+    }, 50);
   }
 
   update() {
@@ -158,84 +193,110 @@ export class Game {
         this.audioManager.updatePlayerAudio(delta, isPlayerMoving, isPlayerRunning);
       }
       
+      if (this.level && this.level.update) {
+        this.level.update(delta);
+      }
+      
       if (this.entity) {
-        this.entity.update(delta, this.player.camera.position);
+        const playerDir = new THREE.Vector3();
+        this.player.camera.getWorldDirection(playerDir);
+        this.entity.update(delta, this.player.camera.position, playerDir);
         
         if (this.audioManager) {
           const dist = this.player.camera.position.distanceTo(this.entity.mesh.position);
           
           // STATE.IDLE = 0, STATE.CHASE = 3
           const isMoving = this.entity.state !== 0;
-          const isChasing = this.entity.state === 3;
-          this.audioManager.updateEnemyAudio(delta, isMoving, isChasing, dist);
+          const isChasing = this.entity.state === 3 || this.entity.state === 1;
+          this.audioManager.updateEnemyAudio(delta, isMoving, isChasing, dist, this.currentLevelIndex);
           
           // Music logic
           if (!this.isJumpscareActive) {
-            this.audioManager.updateMusic(dist);
+            this.audioManager.updateMusic(dist, this.currentLevelIndex);
           }
         }
         
-        // Check defeat condition (jumpscare logic) using 2D distance on XZ plane
         const dx = this.player.camera.position.x - this.entity.mesh.position.x;
         const dz = this.player.camera.position.z - this.entity.mesh.position.z;
-        const distSq = dx*dx + dz*dz;
+        const dist2D = Math.sqrt(dx * dx + dz * dz);
         
-        // distSq < 3.0 means distance < ~1.73 units on the horizontal plane
-        if (distSq < 3.0 && !this.isDebugMode && !this.isJumpscareActive) {
+        let triggerDist = this.currentLevelIndex === 2 ? 2.5 : 1.5;
+        if (dist2D < triggerDist && !this.isDebugMode && !this.isJumpscareActive) {
           this.triggerJumpscare();
         }
       }
       
       // Check keys collection
+      let canInteract = false;
       if (this.level && this.level.keys) {
         for (let i = 0; i < this.level.keys.length; i++) {
           const keyObj = this.level.keys[i];
           if (!keyObj.collected) {
-            keyObj.mesh.rotation.y += delta; // Rotate key
-            keyObj.mesh.position.y = 1.0 + Math.sin(Date.now() * 0.003) * 0.2; // Float
             
             const distToKey = this.player.camera.position.distanceTo(keyObj.position);
-            if (distToKey < 2.0) {
-              keyObj.collected = true;
+            
+            if (this.currentLevelIndex === 1) {
+              // Level 1 logic (keys float, spin, auto-collect)
+              keyObj.mesh.rotation.y += delta;
+              keyObj.mesh.position.y = 1.0 + Math.sin(Date.now() * 0.003) * 0.2;
               
-              // Move far away to prevent shader recompile stutters
-              keyObj.mesh.position.y = -1000; 
-              
-              // Set light intensity to 0
-              keyObj.mesh.children.forEach(c => {
-                if (c.isPointLight) c.intensity = 0;
-              });
-              
-              this.keysCollected++;
-              this.uiManager.updateKeys(this.keysCollected, this.totalKeys);
-              
-              if (this.entity) {
-                // Scale difficulty: up to ~1.75x speed/sight/hearing at 5 keys
-                const mult = 1.0 + (this.keysCollected * 0.15);
-                this.entity.updateDifficulty(mult);
+              if (distToKey < 2.0) {
+                this.collectKey(keyObj);
               }
-              
-              if (this.keysCollected >= this.totalKeys) {
-                document.getElementById('find-exit-text').style.display = 'block';
-              }
-              
-              if (this.audioManager) {
-                this.audioManager.playKeyPickup();
+            } else if (this.currentLevelIndex === 2) {
+              // Level 2 logic (valves attached to walls, require E)
+              if (keyObj.isAnimating) {
+                keyObj.animationTime += delta;
+                keyObj.mesh.children[0].rotation.z += delta * 5.0; // Spin wheel
+                if (keyObj.animationTime > 1.0) {
+                  this.collectKey(keyObj);
+                }
+              } else if (distToKey < 2.5) {
+                const playerDir = new THREE.Vector3();
+                this.player.camera.getWorldDirection(playerDir);
+                const dirToKey = new THREE.Vector3().subVectors(keyObj.position, this.player.camera.position).normalize();
+                
+                if (playerDir.dot(dirToKey) > 0.5) {
+                  canInteract = true;
+                  if (this.player.input.keys.e) {
+                    keyObj.isAnimating = true;
+                    keyObj.animationTime = 0;
+                    this.player.input.keys.e = false; // Prevent holding
+                    
+                    if (this.audioManager) {
+                      this.audioManager.playValveTurn();
+                    }
+                  }
+                }
               }
             }
           }
         }
       }
       
+      const promptEl = document.getElementById('interact-prompt');
+      if (promptEl) {
+        if (canInteract) {
+          promptEl.style.display = 'block';
+        } else {
+          promptEl.style.display = 'none';
+        }
+      }
+      
       // Check win condition (Vault Door)
       if (this.level && this.level.isAtExit(this.player.camera.position)) {
         if (this.keysCollected >= this.totalKeys) {
-          stateManager.setState(GameState.VICTORY);
+          if (this.currentLevelIndex === 1) {
+            this.currentLevelIndex = 2;
+            stateManager.setState(GameState.LOADING);
+          } else {
+            stateManager.setState(GameState.VICTORY);
+          }
         } else {
           // Throttle notification
           if (!this.lastDoorNotify || (Date.now() - this.lastDoorNotify > 3000)) {
             this.lastDoorNotify = Date.now();
-            this.uiManager.showMissingKeysNotification(this.totalKeys - this.keysCollected);
+            this.uiManager.showMissingKeysNotification(this.totalKeys - this.keysCollected, this.currentLevelIndex === 2);
           }
         }
       }
@@ -245,19 +306,85 @@ export class Game {
     this.renderer.render(this.sceneManager.scene, this.player.camera);
   }
 
+  collectKey(keyObj) {
+    keyObj.collected = true;
+    
+    if (this.currentLevelIndex === 1) {
+      // Move far away to prevent shader recompile stutters
+      keyObj.mesh.position.y = -1000; 
+    }
+    
+    // Set light intensity to 0
+    keyObj.mesh.children.forEach(c => {
+      if (c.isPointLight) c.intensity = 0;
+    });
+    
+    this.keysCollected++;
+    this.uiManager.updateKeys(this.keysCollected, this.totalKeys, this.currentLevelIndex === 2);
+    
+    if (this.entity) {
+      // Scale difficulty: up to ~1.75x speed/sight/hearing at 5 keys
+      const mult = 1.0 + (this.keysCollected * 0.15);
+      this.entity.updateDifficulty(mult);
+    }
+    
+    if (this.keysCollected >= this.totalKeys) {
+      document.getElementById('find-exit-text').style.display = 'block';
+      if (this.currentLevelIndex === 2 && this.level.drain) {
+        this.level.drain();
+      }
+    }
+    
+    if (this.audioManager && this.currentLevelIndex === 1) {
+      this.audioManager.playKeyPickup();
+    }
+  }
+
   triggerJumpscare() {
     this.isJumpscareActive = true;
-    stateManager.setState(GameState.JUMPSCARE);
     
-    if (this.audioManager) {
-      this.audioManager.stopMusic();
-      this.audioManager.playScream();
+    const jumpscareEnabled = document.getElementById('toggle-jumpscare') ? document.getElementById('toggle-jumpscare').checked : true;
+    const jumpscareScreen = document.getElementById('jumpscare-screen');
+    const img1 = document.getElementById('jumpscare-img-1');
+    const img2 = document.getElementById('jumpscare-img-2');
+    
+    if (this.currentLevelIndex === 2) {
+      if (img1) img1.style.display = 'none';
+      if (img2) img2.style.display = 'block';
+    } else {
+      if (img1) img1.style.display = 'block';
+      if (img2) img2.style.display = 'none';
     }
-
-    setTimeout(() => {
-      if (stateManager.getState() === GameState.JUMPSCARE) {
-        stateManager.setState(GameState.DEFEAT);
+    
+    if (jumpscareEnabled) {
+      if (jumpscareScreen) jumpscareScreen.classList.remove('safe');
+      stateManager.setState(GameState.JUMPSCARE);
+      
+      if (this.audioManager) {
+        this.audioManager.stopMusic();
+        this.audioManager.playScream();
       }
-    }, 1200);
+
+      setTimeout(() => {
+        if (stateManager.getState() === GameState.JUMPSCARE) {
+          stateManager.setState(GameState.DEFEAT);
+        }
+      }, 1200);
+    } else {
+      // Safe jumpscare
+      if (jumpscareScreen) jumpscareScreen.classList.add('safe');
+      stateManager.setState(GameState.JUMPSCARE);
+      
+      if (this.audioManager) {
+        this.audioManager.stopMusic();
+      }
+      
+      // Wait a bit longer for the safe fade
+      setTimeout(() => {
+        if (stateManager.getState() === GameState.JUMPSCARE) {
+          stateManager.setState(GameState.DEFEAT);
+        }
+      }, 3000);
+    }
   }
 }
