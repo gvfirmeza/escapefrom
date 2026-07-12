@@ -34,9 +34,8 @@ export class InputController {
     document.addEventListener('keyup', this.onKeyUp);
     document.addEventListener('mousemove', this.onMouseMove);
     document.addEventListener('pointerlockchange', this.onPointerlockChange);
-    
     if (this.isMobile) {
-      window.addEventListener('DOMContentLoaded', this.setupMobileControls);
+      this.setupMobileControls();
     }
   }
 
@@ -129,6 +128,15 @@ export class InputController {
     this.bindMobileButton('btn-mobile-run', 'shift');
     this.bindMobileButton('btn-mobile-crouch', 'c');
     this.bindMobileButton('btn-mobile-flashlight', 'f');
+    
+    // Pause button
+    const btnPause = document.getElementById('btn-mobile-pause');
+    if (btnPause) {
+      btnPause.addEventListener('touchstart', (e) => {
+        e.preventDefault();
+        if (this.onUnlock) this.onUnlock();
+      });
+    }
   }
   
   bindMobileButton(id, key) {
