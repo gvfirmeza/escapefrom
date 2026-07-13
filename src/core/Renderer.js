@@ -4,17 +4,25 @@ export class Renderer {
   constructor(container) {
     this.container = container;
     
+    this.isMobile = ('ontouchstart' in window) || (navigator.maxTouchPoints > 0);
+    
     this.instance = new THREE.WebGLRenderer({
-      antialias: true,
+      antialias: !this.isMobile,
       powerPreference: 'high-performance'
     });
     
-    this.instance.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+    // Cap pixel ratio at 1.0 for mobile to save immense performance overhead
+    const pixelRatio = this.isMobile ? 1.0 : Math.min(window.devicePixelRatio, 2);
+    this.instance.setPixelRatio(pixelRatio);
     this.instance.setSize(window.innerWidth, window.innerHeight);
     
     // Shadows
-    this.instance.shadowMap.enabled = true;
-    this.instance.shadowMap.type = THREE.PCFSoftShadowMap;
+    if (!this.isMobile) {
+      this.instance.shadowMap.enabled = true;
+      this.instance.shadowMap.type = THREE.PCFSoftShadowMap;
+    } else {
+      this.instance.shadowMap.enabled = false;
+    }
     
     // Tone mapping for better lighting
     this.instance.toneMapping = THREE.ACESFilmicToneMapping;
@@ -27,7 +35,8 @@ export class Renderer {
 
   onResize() {
     this.instance.setSize(window.innerWidth, window.innerHeight);
-    this.instance.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+    const pixelRatio = this.isMobile ? 1.0 : Math.min(window.devicePixelRatio, 2);
+    this.instance.setPixelRatio(pixelRatio);
   }
 
   render(scene, camera) {
