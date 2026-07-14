@@ -70,30 +70,27 @@ export class UIManager {
     this.vcrToggle = document.getElementById('toggle-vcr');
     this.qualityBtns = document.querySelectorAll('.btn-quality');
     
-    // Load settings
+    // Load local settings
     this.settings = {
       sensitivity: parseInt(localStorage.getItem('br_sensitivity')) || 10,
       gamma: parseFloat(localStorage.getItem('br_gamma')) || 1.0,
       vcr: localStorage.getItem('br_vcr') !== 'false',
       quality: localStorage.getItem('br_quality') || ( ('ontouchstart' in window) ? 'low' : 'high' ),
-      toggleRun: localStorage.getItem('br_run') === 'true'
+      toggleRun: localStorage.getItem('br_run') === 'true',
+      jumpscares: localStorage.getItem('br_jumpscares') !== 'false',
+      flashingLights: localStorage.getItem('br_flashing') !== 'false',
     };
     
-    // Apply loaded settings to UI
-    this.sensitivitySlider.value = this.settings.sensitivity;
-    this.sensitivityValue.textContent = this.settings.sensitivity;
-    this.gammaSlider.value = this.settings.gamma;
-    this.gammaValue.textContent = this.settings.gamma;
-    this.vcrToggle.checked = this.settings.vcr;
-    this.qualityBtns.forEach(b => {
-      if (b.dataset.quality === this.settings.quality) b.classList.add('active');
-      else b.classList.remove('active');
-    });
+    this.applySettings();
 
-    // Dispatch initial event after a short delay to allow components to listen
-    setTimeout(() => {
-      window.dispatchEvent(new CustomEvent('settings_changed', { detail: this.settings }));
-    }, 100);
+    if (window.bridge) {
+      bridge.storage.get('settings').then(data => {
+        if (data && typeof data === 'object') {
+          this.settings = { ...this.settings, ...data };
+          this.applySettings();
+        }
+      }).catch(() => {});
+    }
 
     const openSettings = (e) => {
       e.stopPropagation();
@@ -110,34 +107,27 @@ export class UIManager {
     this.sensitivitySlider.addEventListener('input', (e) => {
       this.settings.sensitivity = parseInt(e.target.value);
       this.sensitivityValue.textContent = this.settings.sensitivity;
-      localStorage.setItem('br_sensitivity', this.settings.sensitivity);
-      window.dispatchEvent(new CustomEvent('settings_changed', { detail: this.settings }));
+      this.saveSettings();
     });
 
     this.gammaSlider.addEventListener('input', (e) => {
       this.settings.gamma = parseFloat(e.target.value);
       this.gammaValue.textContent = this.settings.gamma.toFixed(1);
-      localStorage.setItem('br_gamma', this.settings.gamma);
-      window.dispatchEvent(new CustomEvent('settings_changed', { detail: this.settings }));
+      this.saveSettings();
     });
 
     this.vcrToggle.addEventListener('change', (e) => {
       this.settings.vcr = e.target.checked;
       document.body.classList.toggle('disable-vcr', !this.settings.vcr);
-      localStorage.setItem('br_vcr', this.settings.vcr);
-      window.dispatchEvent(new CustomEvent('settings_changed', { detail: this.settings }));
+      this.saveSettings();
     });
     
-    // Initial VCR class
-    document.body.classList.toggle('disable-vcr', !this.settings.vcr);
-
     this.qualityBtns.forEach(btn => {
       btn.addEventListener('click', (e) => {
         this.qualityBtns.forEach(b => b.classList.remove('active'));
         e.target.classList.add('active');
         this.settings.quality = e.target.dataset.quality;
-        localStorage.setItem('br_quality', this.settings.quality);
-        window.dispatchEvent(new CustomEvent('settings_changed', { detail: this.settings }));
+        this.saveSettings();
       });
     });
 
@@ -148,21 +138,29 @@ export class UIManager {
     const flashToggle = document.getElementById('toggle-flashing');
     if (flashToggle) {
       flashToggle.addEventListener('change', (e) => {
-        if (!e.target.checked) {
+        this.settings.flashingLights = e.target.checked;
+        if (!this.settings.flashingLights) {
           document.body.classList.add('safe-mode');
         } else {
           document.body.classList.remove('safe-mode');
         }
+        this.saveSettings();
       });
     }
 
     const toggleRunMode = document.getElementById('toggle-run-mode');
     if (toggleRunMode) {
-      toggleRunMode.checked = this.settings.toggleRun;
       toggleRunMode.addEventListener('change', (e) => {
         this.settings.toggleRun = e.target.checked;
-        localStorage.setItem('br_run', this.settings.toggleRun);
-        window.dispatchEvent(new CustomEvent('settings_changed', { detail: this.settings }));
+        this.saveSettings();
+      });
+    }
+    
+    const jumpscareToggle = document.getElementById('toggle-jumpscare');
+    if (jumpscareToggle) {
+      jumpscareToggle.addEventListener('change', (e) => {
+        this.settings.jumpscares = e.target.checked;
+        this.saveSettings();
       });
     }
     
@@ -381,6 +379,7 @@ export class UIManager {
           langCurrent.textContent = opt.textContent;
           localStorage.setItem('br_lang', val);
           this.setLanguage(val);
+          this.saveSettings();
           langOptions.classList.add('select-hide');
         });
       });
@@ -394,9 +393,72 @@ export class UIManager {
     this.setLanguage(this.currentLang);
   }
 
+  applySettings() {
+    if (this.sensitivitySlider) {
+      this.sensitivitySlider.value = this.settings.sensitivity;
+      this.sensitivityValue.textContent = this.settings.sensitivity;
+    }
+    if (this.gammaSlider) {
+      this.gammaSlider.value = this.settings.gamma;
+      this.gammaValue.textContent = this.settings.gamma.toFixed(1);
+    }
+    if (this.vcrToggle) {
+      this.vcrToggle.checked = this.settings.vcr;
+      document.body.classList.toggle('disable-vcr', !this.settings.vcr);
+    }
+    if (this.qualityBtns) {
+      this.qualityBtns.forEach(b => {
+        if (b.dataset.quality === this.settings.quality) b.classList.add('active');
+        else b.classList.remove('active');
+      });
+    }
+    
+    const flashToggle = document.getElementById('toggle-flashing');
+    if (flashToggle) {
+      flashToggle.checked = this.settings.flashingLights;
+      if (!this.settings.flashingLights) {
+        document.body.classList.add('safe-mode');
+      } else {
+        document.body.classList.remove('safe-mode');
+      }
+    }
+    
+    const toggleRunMode = document.getElementById('toggle-run-mode');
+    if (toggleRunMode) {
+      toggleRunMode.checked = this.settings.toggleRun;
+    }
+    
+    const jumpscareToggle = document.getElementById('toggle-jumpscare');
+    if (jumpscareToggle) {
+      jumpscareToggle.checked = this.settings.jumpscares;
+    }
+    
+    window.dispatchEvent(new CustomEvent('settings_changed', { detail: this.settings }));
+  }
+
+  saveSettings() {
+    localStorage.setItem('br_sensitivity', this.settings.sensitivity);
+    localStorage.setItem('br_gamma', this.settings.gamma);
+    localStorage.setItem('br_vcr', this.settings.vcr);
+    localStorage.setItem('br_quality', this.settings.quality);
+    localStorage.setItem('br_run', this.settings.toggleRun);
+    localStorage.setItem('br_jumpscares', this.settings.jumpscares);
+    localStorage.setItem('br_flashing', this.settings.flashingLights);
+    
+    if (window.bridge) {
+      bridge.storage.set('settings', this.settings).catch(e => console.warn("Failed to sync settings to cloud", e));
+    }
+    window.dispatchEvent(new CustomEvent('settings_changed', { detail: this.settings }));
+  }
+
   setLanguage(langCode) {
     if (!this.translations[langCode]) return;
     this.currentLang = langCode;
+    if (this.settings) {
+      this.settings.lang = langCode;
+      // Note: we don't call saveSettings() here initially to avoid double-firing if loading,
+      // but if called from UI click, it's fine. We already save to localStorage in the click event.
+    }
     const dict = this.translations[langCode];
     
     document.querySelectorAll('[data-i18n]').forEach(el => {
