@@ -104,7 +104,7 @@ export class Game {
             this.audioManager.audioContext.suspend();
           }
         } else if (state === 'rewarded') {
-          window.dispatchEvent(new CustomEvent('revive_player'));
+          this.revivePlayer();
           stateManager.setState(GameState.PLAYING);
         } else if (state === 'closed' || state === 'failed') {
           if (this.audioManager && this.audioManager.audioContext && stateManager.getState() !== GameState.PAUSED) {
@@ -114,9 +114,10 @@ export class Game {
       });
     }
     
-    // Revive Listener
+    // Revive Listener fallback (if any other part of UI dispatches it)
     window.addEventListener('revive_player', () => {
-      this.startNewGame(true);
+      this.revivePlayer();
+      stateManager.setState(GameState.PLAYING);
     });
     
     // Start loop
@@ -221,6 +222,21 @@ export class Game {
       // Transition to playing
       stateManager.setState(GameState.PLAYING);
     }, 50);
+  }
+
+  revivePlayer() {
+    this.isJumpscareActive = false;
+    
+    const img1 = document.getElementById('jumpscare-img-1');
+    const img2 = document.getElementById('jumpscare-img-2');
+    if (img1) img1.style.display = 'none';
+    if (img2) img2.style.display = 'none';
+
+    if (this.entity && this.level) {
+      const spawnPos = this.player.camera.position;
+      const entitySpawn = this.level.getRandomEmptyPositionFarFrom(spawnPos, 20);
+      this.entity.spawn(entitySpawn);
+    }
   }
 
   update() {
