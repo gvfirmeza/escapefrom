@@ -196,6 +196,10 @@ export class UIManager {
         gamma_brightness: "Brightness (Gamma)",
         enable_vcr: "Enable VCR Effect",
         graphics_quality: "Graphics Quality",
+        settings: "SETTINGS",
+        quality_low: "Low",
+        quality_medium: "Medium",
+        quality_high: "High",
         close: "CLOSE"
       },
       pt: {
@@ -234,6 +238,10 @@ export class UIManager {
         gamma_brightness: "Brilho (Gamma)",
         enable_vcr: "Efeito VCR/VHS",
         graphics_quality: "Qualidade Gráfica",
+        settings: "CONFIGURAÇÕES",
+        quality_low: "Baixo",
+        quality_medium: "Médio",
+        quality_high: "Alto",
         close: "FECHAR"
       },
       es: {
@@ -272,6 +280,10 @@ export class UIManager {
         gamma_brightness: "Brillo (Gamma)",
         enable_vcr: "Efecto VCR/VHS",
         graphics_quality: "Calidad Gráfica",
+        settings: "AJUSTES",
+        quality_low: "Bajo",
+        quality_medium: "Medio",
+        quality_high: "Alto",
         close: "CERRAR"
       },
       fr: {
@@ -310,6 +322,10 @@ export class UIManager {
         gamma_brightness: "Luminosité (Gamma)",
         enable_vcr: "Effet VCR/VHS",
         graphics_quality: "Qualité Graphique",
+        settings: "PARAMÈTRES",
+        quality_low: "Bas",
+        quality_medium: "Moyen",
+        quality_high: "Haut",
         close: "FERMER"
       }
     };
