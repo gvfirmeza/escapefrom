@@ -352,8 +352,16 @@ export class UIManager {
         close: "FERMER"
       }
     };
+    this.currentLang = localStorage.getItem('br_lang') || 'en';
     
-    this.currentLang = 'en';
+    // Auto-sync language with Playgama SDK if no saved preference
+    if (!localStorage.getItem('br_lang') && window.bridge && window.bridge.platform && window.bridge.platform.language) {
+      const bridgeLang = window.bridge.platform.language.toLowerCase().substring(0, 2);
+      if (this.translations[bridgeLang]) {
+        this.currentLang = bridgeLang;
+      }
+    }
+    
     const langCurrent = document.getElementById('lang-current');
     const langOptions = document.getElementById('lang-options');
     
@@ -371,6 +379,7 @@ export class UIManager {
         opt.addEventListener('click', (e) => {
           const val = opt.getAttribute('data-value');
           langCurrent.textContent = opt.textContent;
+          localStorage.setItem('br_lang', val);
           this.setLanguage(val);
           langOptions.classList.add('select-hide');
         });
@@ -380,14 +389,6 @@ export class UIManager {
       document.addEventListener('click', () => {
         langOptions.classList.add('select-hide');
       });
-    }
-    
-    // Auto-sync language with Playgama SDK if available
-    if (window.bridge && window.bridge.platform && window.bridge.platform.language) {
-      const bridgeLang = window.bridge.platform.language.toLowerCase().substring(0, 2);
-      if (this.translations[bridgeLang]) {
-        this.currentLang = bridgeLang;
-      }
     }
     
     this.setLanguage(this.currentLang);
