@@ -1,0 +1,21 @@
+{
+  "platforms": {
+    "playgama": {
+      "options": {}
+    }
+  },
+  "advertisement": {
+    "useBuiltInErrorPopup": true,
+    "interstitial": {
+      "preloadOnStart": true
+    },
+    "rewarded": {
+      "preloadOnStart": true
+    },
+    "banner": {
+      "preloadOnStart": true
+    }
+  },
+  "sendAnalyticsEvents": true,
+  "showFullLoadingLogo": true
+}

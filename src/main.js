@@ -5,11 +5,12 @@ window.addEventListener('DOMContentLoaded', () => {
     bridge.initialize()
       .then(() => {
         console.log("Playgama Bridge initialized successfully.");
-        bridge.storage.get()
+        bridge.storage.get('level')
           .then(data => {
             const game = new Game();
-            if (data && data.level) {
-              game.currentLevelIndex = data.level;
+            // in v2, getting 'level' returns the value directly
+            if (data !== undefined && data !== null) {
+              game.currentLevelIndex = parseInt(data);
             }
             game.init();
             bridge.platform.sendMessage('game_ready');

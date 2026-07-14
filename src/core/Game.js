@@ -318,7 +318,7 @@ export class Game {
         if (this.keysCollected >= this.totalKeys) {
           if (this.currentLevelIndex === 1) {
             this.currentLevelIndex = 2;
-            if (window.bridge) bridge.storage.set({ level: 2 });
+            if (window.bridge) bridge.storage.set('level', 2);
             stateManager.setState(GameState.LOADING);
           } else {
             stateManager.setState(GameState.VICTORY);
