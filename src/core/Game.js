@@ -114,6 +114,42 @@ export class Game {
       });
     }
     
+    // Playgama Bridge Platform Listeners
+    if (window.bridge && window.bridge.platform) {
+      window.bridge.platform.on('pause', () => {
+        if (stateManager.getState() === GameState.PLAYING) {
+          stateManager.setState(GameState.PAUSED);
+        }
+        if (this.audioManager && this.audioManager.audioContext) {
+          this.audioManager.audioContext.suspend();
+        }
+      });
+      
+      window.bridge.platform.on('resume', () => {
+        if (this.audioManager && this.audioManager.audioContext && stateManager.getState() !== GameState.PAUSED) {
+          if (window.bridge.platform.isAudioEnabled !== false) {
+            this.audioManager.audioContext.resume();
+          }
+        }
+      });
+      
+      // Some versions of Playgama use a dedicated audio state event
+      window.bridge.platform.on('audio_state_changed', (isEnabled) => {
+        if (this.audioManager && this.audioManager.audioContext) {
+          if (isEnabled && stateManager.getState() !== GameState.PAUSED) {
+            this.audioManager.audioContext.resume();
+          } else {
+            this.audioManager.audioContext.suspend();
+          }
+        }
+      });
+      
+      // Initial Sync
+      if (window.bridge.platform.isAudioEnabled === false && this.audioManager && this.audioManager.audioContext) {
+        this.audioManager.audioContext.suspend();
+      }
+    }
+    
     // Revive Listener fallback (if any other part of UI dispatches it)
     window.addEventListener('revive_player', () => {
       this.revivePlayer();

@@ -651,7 +651,7 @@ body.safe-mode #find-exit-text {
   }
 }
 
-@media screen and (max-width: 900px) and (orientation: portrait) {
+@media screen and (max-width: 900px) and (orientation: portrait) and (max-aspect-ratio: 99/100) {
   #rotate-screen {
     display: flex !important;
     opacity: 1 !important;
