@@ -318,18 +318,31 @@ export class PoolRoomsLevel {
   
   getRandomEmptyPositionFarFrom(pos, minDistance) {
     const emptyCoords = [];
-    for (let y = 0; y < this.grid.height; y++) {
-      for (let x = 0; x < this.grid.width; x++) {
-        if (!this.grid.isSolid(x, y)) {
-          const px = x * this.tileSize;
-          const pz = y * this.tileSize;
-          const dist = Math.hypot(px - pos.x, pz - pos.z);
-          if (dist >= minDistance) {
-            emptyCoords.push(new THREE.Vector3(px, 1.5, pz));
+    if (this.validCoords && this.validCoords.length > 0) {
+      for (const cell of this.validCoords) {
+        const px = cell.x * this.tileSize;
+        const pz = cell.y * this.tileSize;
+        const dist = Math.hypot(px - pos.x, pz - pos.z);
+        if (dist >= minDistance) {
+          emptyCoords.push(new THREE.Vector3(px, 1.5, pz));
+        }
+      }
+    } else {
+      // fallback
+      for (let y = 0; y < this.grid.height; y++) {
+        for (let x = 0; x < this.grid.width; x++) {
+          if (!this.grid.isSolid(x, y)) {
+            const px = x * this.tileSize;
+            const pz = y * this.tileSize;
+            const dist = Math.hypot(px - pos.x, pz - pos.z);
+            if (dist >= minDistance) {
+              emptyCoords.push(new THREE.Vector3(px, 1.5, pz));
+            }
           }
         }
       }
     }
+    
     if (emptyCoords.length === 0) return pos.clone();
     return emptyCoords[Math.floor(Math.random() * emptyCoords.length)];
   }

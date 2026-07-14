@@ -75,7 +75,8 @@ export class UIManager {
       sensitivity: parseInt(localStorage.getItem('br_sensitivity')) || 10,
       gamma: parseFloat(localStorage.getItem('br_gamma')) || 1.0,
       vcr: localStorage.getItem('br_vcr') !== 'false',
-      quality: localStorage.getItem('br_quality') || ( ('ontouchstart' in window) ? 'low' : 'high' )
+      quality: localStorage.getItem('br_quality') || ( ('ontouchstart' in window) ? 'low' : 'high' ),
+      toggleRun: localStorage.getItem('br_run') === 'true'
     };
     
     // Apply loaded settings to UI
@@ -154,6 +155,16 @@ export class UIManager {
         }
       });
     }
+
+    const toggleRunMode = document.getElementById('toggle-run-mode');
+    if (toggleRunMode) {
+      toggleRunMode.checked = this.settings.toggleRun;
+      toggleRunMode.addEventListener('change', (e) => {
+        this.settings.toggleRun = e.target.checked;
+        localStorage.setItem('br_run', this.settings.toggleRun);
+        window.dispatchEvent(new CustomEvent('settings_changed', { detail: this.settings }));
+      });
+    }
     
     // Initial sync
     this.updateScreens(stateManager.getState());
@@ -200,6 +211,9 @@ export class UIManager {
         quality_low: "Low",
         quality_medium: "Medium",
         quality_high: "High",
+        language: "Language:",
+        controls: "CONTROLS",
+        toggle_run: "Toggle Run Mode",
         close: "CLOSE"
       },
       pt: {
@@ -242,6 +256,9 @@ export class UIManager {
         quality_low: "Baixo",
         quality_medium: "Médio",
         quality_high: "Alto",
+        language: "Idioma:",
+        controls: "CONTROLES",
+        toggle_run: "Alternar Modo de Correr",
         close: "FECHAR"
       },
       es: {
@@ -284,6 +301,9 @@ export class UIManager {
         quality_low: "Bajo",
         quality_medium: "Medio",
         quality_high: "Alto",
+        language: "Idioma:",
+        controls: "CONTROLES",
+        toggle_run: "Alternar Modo Correr",
         close: "CERRAR"
       },
       fr: {
@@ -326,6 +346,9 @@ export class UIManager {
         quality_low: "Bas",
         quality_medium: "Moyen",
         quality_high: "Haut",
+        language: "Langue:",
+        controls: "CONTRÔLES",
+        toggle_run: "Bascule Mode Course",
         close: "FERMER"
       }
     };

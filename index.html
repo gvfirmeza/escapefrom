@@ -21,7 +21,7 @@
         <h2>THE BACKROOMS</h2>
         <div class="menu-content">
           <div class="lang-selector">
-            <label>Language:</label>
+            <label data-i18n="language">Language:</label>
             <div class="custom-select" id="custom-lang-select">
               <div class="select-selected" id="lang-current">English</div>
               <div class="select-items select-hide" id="lang-options">
@@ -53,7 +53,7 @@
           </div>
           
           <div class="controls-info">
-            <h3>CONTROLS</h3>
+            <h3 data-i18n="controls">CONTROLS</h3>
             <ul>
               <li><strong>WASD</strong>: <span data-i18n="move">Mover</span></li>
               <li><strong>Mouse</strong>: <span data-i18n="look">Olhar</span></li>
@@ -61,7 +61,6 @@
               <li><strong>Ctrl / C</strong>: <span data-i18n="crouch">Agachar</span></li>
               <li><strong>F</strong>: <span data-i18n="flashlight">Lanterna</span></li>
               <li><strong>E</strong>: <span data-i18n="interact">Interagir</span></li>
-              <li><strong>Ctrl + Shift + D</strong>: Debug Mode</li>
             </ul>
           </div>
         </div>
@@ -157,6 +156,15 @@
               <input type="checkbox" id="toggle-vcr" checked>
               <span class="checkmark"></span>
               <span style="color: #ccc; font-family: monospace; font-size: 1.2rem;" data-i18n="enable_vcr">Enable VCR Effect</span>
+            </label>
+          </div>
+          
+          <!-- Toggle Run Mode -->
+          <div class="setting-group" style="display: flex; align-items: center; gap: 1rem;">
+            <label class="custom-checkbox">
+              <input type="checkbox" id="toggle-run-mode">
+              <span class="checkmark"></span>
+              <span style="color: #ccc; font-family: monospace; font-size: 1.2rem;" data-i18n="toggle_run">Toggle Run Mode</span>
             </label>
           </div>
           

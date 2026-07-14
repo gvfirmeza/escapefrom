@@ -23,6 +23,17 @@ export class InputController {
     this.activeCameraTouchId = null;
     this.activeJoystickTouchId = null;
     
+    this.toggleRunEnabled = false;
+    window.addEventListener('settings_changed', (e) => {
+      if (e.detail && e.detail.toggleRun !== undefined) {
+        this.toggleRunEnabled = e.detail.toggleRun;
+        // reset shift state when toggling settings
+        this.keys.shift = false;
+        const btn = document.getElementById('btn-mobile-run');
+        if (btn) btn.classList.remove('active');
+      }
+    });
+    
     // Bind events
     this.onKeyDown = this.onKeyDown.bind(this);
     this.onKeyUp = this.onKeyUp.bind(this);
@@ -143,16 +154,32 @@ export class InputController {
     const btn = document.getElementById(id);
     if (!btn) return;
     
-    btn.addEventListener('touchstart', (e) => {
+    const startEvent = (e) => {
       e.preventDefault();
-      this.keys[key] = true;
-    });
+      if (key === 'shift' && this.toggleRunEnabled) {
+        this.keys[key] = !this.keys[key];
+        if (this.keys[key]) {
+          btn.classList.add('active');
+          btn.style.boxShadow = "0 0 15px rgba(255, 255, 255, 0.5)"; // visual active state
+        } else {
+          btn.classList.remove('active');
+          btn.style.boxShadow = "";
+        }
+      } else {
+        this.keys[key] = true;
+      }
+    };
     
     const endEvent = (e) => {
       e.preventDefault();
+      if (key === 'shift' && this.toggleRunEnabled) {
+        // Do nothing on release if it's toggle
+        return;
+      }
       this.keys[key] = false;
     };
     
+    btn.addEventListener('touchstart', startEvent, { passive: false });
     btn.addEventListener('touchend', endEvent);
     btn.addEventListener('touchcancel', endEvent);
   }
@@ -201,7 +228,14 @@ export class InputController {
     }
     
     if (this.keys.hasOwnProperty(key)) {
-      this.keys[key] = true;
+      if (key === 'shift' && this.toggleRunEnabled) {
+        // Toggle on keydown, prevent holding
+        if (!event.repeat) {
+          this.keys[key] = !this.keys[key];
+        }
+      } else {
+        this.keys[key] = true;
+      }
     }
     if (key === 'control') {
       this.keys.ctrl = true;
@@ -211,7 +245,11 @@ export class InputController {
   onKeyUp(event) {
     const key = event.key.toLowerCase();
     if (this.keys.hasOwnProperty(key)) {
-      this.keys[key] = false;
+      if (key === 'shift' && this.toggleRunEnabled) {
+        // Do nothing on key up if toggle is enabled
+      } else {
+        this.keys[key] = false;
+      }
     }
     if (key === 'control') {
       this.keys.ctrl = false;
