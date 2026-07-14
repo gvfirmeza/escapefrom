@@ -27,7 +27,7 @@ export class AudioManager {
   
   async loadKeySound() {
     try {
-      const response = await fetch('/key.mp3');
+      const response = await fetch('./key.mp3');
       const arrayBuffer = await response.arrayBuffer();
       this.keyBuffer = await this.audioContext.decodeAudioData(arrayBuffer);
     } catch (e) {
@@ -39,7 +39,7 @@ export class AudioManager {
     try {
       if (this.musicSource) return; // Already loaded
       
-      const response = await fetch('/music.mp3');
+      const response = await fetch('./music.mp3');
       const arrayBuffer = await response.arrayBuffer();
       this.musicBuffer = await this.audioContext.decodeAudioData(arrayBuffer);
       

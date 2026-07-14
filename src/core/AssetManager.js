@@ -25,7 +25,7 @@ export class AssetManager {
         if (loaded1 && loaded2) resolve();
       };
       
-      loader.load('/tung_tung_tung_sahur/scene.gltf', (gltf) => {
+      loader.load('./tung_tung_tung_sahur/scene.gltf', (gltf) => {
         const model = gltf.scene;
         model.traverse((child) => {
           if (child.isMesh) {
@@ -42,7 +42,7 @@ export class AssetManager {
         checkDone();
       });
       
-      loader.load('/tralalero_tralala/scene.gltf', (gltf) => {
+      loader.load('./tralalero_tralala/scene.gltf', (gltf) => {
         const model = gltf.scene;
         model.traverse((child) => {
           if (child.isMesh) {
