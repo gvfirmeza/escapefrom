@@ -12,20 +12,22 @@ window.addEventListener('DOMContentLoaded', () => {
             if (data !== undefined && data !== null) {
               game.currentLevelIndex = parseInt(data);
             }
-            game.init();
-            requestAnimationFrame(() => {
+            game.init().then(() => {
               requestAnimationFrame(() => {
-                bridge.platform.sendMessage('game_ready');
+                requestAnimationFrame(() => {
+                  bridge.platform.sendMessage('game_ready');
+                });
               });
             });
           })
           .catch(e => {
             console.error("Storage get failed", e);
             const game = new Game();
-            game.init();
-            requestAnimationFrame(() => {
+            game.init().then(() => {
               requestAnimationFrame(() => {
-                bridge.platform.sendMessage('game_ready');
+                requestAnimationFrame(() => {
+                  bridge.platform.sendMessage('game_ready');
+                });
               });
             });
           });
@@ -34,11 +36,15 @@ window.addEventListener('DOMContentLoaded', () => {
         console.error("Bridge initialization failed:", error);
         // Fallback to start game anyway
         const game = new Game();
-        game.init();
+        game.init().then(() => {
+          // Normal start
+        });
       });
   } else {
     // No bridge found, start normally
     const game = new Game();
-    game.init();
+    game.init().then(() => {
+      // Normal start
+    });
   }
 });
