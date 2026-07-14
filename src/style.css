@@ -62,6 +62,10 @@ body, html {
   pointer-events: none;
 }
 
+body.disable-vcr #ui-layer::before {
+  display: none !important;
+}
+
 /* Vignette Overlay */
 #ui-layer::after {
   content: " ";

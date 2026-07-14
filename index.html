@@ -137,9 +137,27 @@
           <div class="setting-group">
             <label style="color: #ccc; font-family: monospace; font-size: 1.2rem; display: block; margin-bottom: 0.5rem;" data-i18n="camera_sensitivity">Camera Sensitivity</label>
             <div style="display: flex; align-items: center; gap: 1rem;">
-              <input type="range" id="sensitivity-slider" min="0.0005" max="0.005" step="0.0001" value="0.002" style="flex: 1;">
-              <span id="sensitivity-value" style="color: white; font-family: monospace; width: 50px; text-align: right;">0.002</span>
+              <input type="range" id="sensitivity-slider" min="1" max="100" step="1" value="10" style="flex: 1;">
+              <span id="sensitivity-value" style="color: white; font-family: monospace; width: 50px; text-align: right;">10</span>
             </div>
+          </div>
+          
+          <!-- Brightness / Gamma -->
+          <div class="setting-group">
+            <label style="color: #ccc; font-family: monospace; font-size: 1.2rem; display: block; margin-bottom: 0.5rem;" data-i18n="gamma_brightness">Brightness</label>
+            <div style="display: flex; align-items: center; gap: 1rem;">
+              <input type="range" id="gamma-slider" min="0.5" max="3.0" step="0.1" value="1.0" style="flex: 1;">
+              <span id="gamma-value" style="color: white; font-family: monospace; width: 50px; text-align: right;">1.0</span>
+            </div>
+          </div>
+
+          <!-- VCR Effect Toggle -->
+          <div class="setting-group" style="display: flex; align-items: center; gap: 1rem;">
+            <label class="custom-checkbox">
+              <input type="checkbox" id="toggle-vcr" checked>
+              <span class="checkmark"></span>
+              <span style="color: #ccc; font-family: monospace; font-size: 1.2rem;" data-i18n="enable_vcr">Enable VCR Effect</span>
+            </label>
           </div>
           
           <!-- Graphics Quality -->

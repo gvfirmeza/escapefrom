@@ -45,8 +45,10 @@ export class Renderer {
       }
       this.instance.setPixelRatio(this.currentQualityScale);
       
-      // Update shadows dynamically? 
-      // For now, let's keep shadows tied to isMobile, but we could tie it to quality.
+      // Update Gamma
+      if (e.detail.gamma !== undefined) {
+        this.instance.toneMappingExposure = e.detail.gamma;
+      }
     });
   }
 

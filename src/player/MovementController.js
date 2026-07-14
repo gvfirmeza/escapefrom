@@ -28,7 +28,7 @@ export class MovementController {
     
     // Settings listener
     window.addEventListener('settings_changed', (e) => {
-      this.sensitivity = e.detail.sensitivity;
+      this.sensitivity = (e.detail.sensitivity || 10) * 0.0002;
     });
   }
 

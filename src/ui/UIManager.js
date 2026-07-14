@@ -62,21 +62,28 @@ export class UIManager {
       });
     });
 
-    // Settings logic
     this.settingsScreen = document.getElementById('settings-screen');
     this.sensitivitySlider = document.getElementById('sensitivity-slider');
     this.sensitivityValue = document.getElementById('sensitivity-value');
+    this.gammaSlider = document.getElementById('gamma-slider');
+    this.gammaValue = document.getElementById('gamma-value');
+    this.vcrToggle = document.getElementById('toggle-vcr');
     this.qualityBtns = document.querySelectorAll('.btn-quality');
     
     // Load settings
     this.settings = {
-      sensitivity: parseFloat(localStorage.getItem('br_sensitivity')) || 0.002,
+      sensitivity: parseInt(localStorage.getItem('br_sensitivity')) || 10,
+      gamma: parseFloat(localStorage.getItem('br_gamma')) || 1.0,
+      vcr: localStorage.getItem('br_vcr') !== 'false',
       quality: localStorage.getItem('br_quality') || ( ('ontouchstart' in window) ? 'low' : 'high' )
     };
     
     // Apply loaded settings to UI
     this.sensitivitySlider.value = this.settings.sensitivity;
     this.sensitivityValue.textContent = this.settings.sensitivity;
+    this.gammaSlider.value = this.settings.gamma;
+    this.gammaValue.textContent = this.settings.gamma;
+    this.vcrToggle.checked = this.settings.vcr;
     this.qualityBtns.forEach(b => {
       if (b.dataset.quality === this.settings.quality) b.classList.add('active');
       else b.classList.remove('active');
@@ -100,11 +107,28 @@ export class UIManager {
     });
 
     this.sensitivitySlider.addEventListener('input', (e) => {
-      this.settings.sensitivity = parseFloat(e.target.value);
+      this.settings.sensitivity = parseInt(e.target.value);
       this.sensitivityValue.textContent = this.settings.sensitivity;
       localStorage.setItem('br_sensitivity', this.settings.sensitivity);
       window.dispatchEvent(new CustomEvent('settings_changed', { detail: this.settings }));
     });
+
+    this.gammaSlider.addEventListener('input', (e) => {
+      this.settings.gamma = parseFloat(e.target.value);
+      this.gammaValue.textContent = this.settings.gamma.toFixed(1);
+      localStorage.setItem('br_gamma', this.settings.gamma);
+      window.dispatchEvent(new CustomEvent('settings_changed', { detail: this.settings }));
+    });
+
+    this.vcrToggle.addEventListener('change', (e) => {
+      this.settings.vcr = e.target.checked;
+      document.body.classList.toggle('disable-vcr', !this.settings.vcr);
+      localStorage.setItem('br_vcr', this.settings.vcr);
+      window.dispatchEvent(new CustomEvent('settings_changed', { detail: this.settings }));
+    });
+    
+    // Initial VCR class
+    document.body.classList.toggle('disable-vcr', !this.settings.vcr);
 
     this.qualityBtns.forEach(btn => {
       btn.addEventListener('click', (e) => {
@@ -167,7 +191,12 @@ export class UIManager {
         enable_jumpscares: "Enable Jumpscares",
         enable_flashing: "Enable Flashing Lights",
         rotate_screen: "PLEASE ROTATE YOUR DEVICE",
-        revive: "WATCH AD TO REVIVE"
+        revive: "WATCH AD TO REVIVE",
+        camera_sensitivity: "Camera Sensitivity",
+        gamma_brightness: "Brightness (Gamma)",
+        enable_vcr: "Enable VCR Effect",
+        graphics_quality: "Graphics Quality",
+        close: "CLOSE"
       },
       pt: {
         warning: "Aviso: Contém luzes piscantes e sons altos.",
@@ -200,7 +229,12 @@ export class UIManager {
         enable_jumpscares: "Ativar Jumpscares",
         enable_flashing: "Ativar Luzes Piscantes",
         rotate_screen: "POR FAVOR, GIRE A TELA",
-        revive: "ASSISTIR ANÚNCIO PARA REVIVER"
+        revive: "ASSISTIR ANÚNCIO PARA REVIVER",
+        camera_sensitivity: "Sensibilidade da Câmera",
+        gamma_brightness: "Brilho (Gamma)",
+        enable_vcr: "Efeito VCR/VHS",
+        graphics_quality: "Qualidade Gráfica",
+        close: "FECHAR"
       },
       es: {
         warning: "Aviso: Contiene luces intermitentes y sonidos fuertes.",
@@ -233,7 +267,12 @@ export class UIManager {
         enable_jumpscares: "Activar Jumpscares",
         enable_flashing: "Activar Luces Parpadeantes",
         rotate_screen: "POR FAVOR, GIRE LA PANTALLA",
-        revive: "VER ANUNCIO PARA REVIVIR"
+        revive: "VER ANUNCIO PARA REVIVIR",
+        camera_sensitivity: "Sensibilidad de la Cámara",
+        gamma_brightness: "Brillo (Gamma)",
+        enable_vcr: "Efecto VCR/VHS",
+        graphics_quality: "Calidad Gráfica",
+        close: "CERRAR"
       },
       fr: {
         warning: "Avertissement: Contient des lumières clignotantes et des sons forts.",
@@ -266,7 +305,12 @@ export class UIManager {
         enable_jumpscares: "Activer Jumpscares",
         enable_flashing: "Activer Lumières Clignotantes",
         rotate_screen: "VEUILLEZ TOURNER L'ÉCRAN",
-        revive: "REGARDER LA PUB POUR REVIVRE"
+        revive: "REGARDER LA PUB POUR REVIVRE",
+        camera_sensitivity: "Sensibilité de la Caméra",
+        gamma_brightness: "Luminosité (Gamma)",
+        enable_vcr: "Effet VCR/VHS",
+        graphics_quality: "Qualité Graphique",
+        close: "FERMER"
       }
     };
     
