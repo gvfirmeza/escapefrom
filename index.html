@@ -131,7 +131,7 @@
       <!-- Settings Screen -->
       <div id="settings-screen" class="screen" style="z-index: 200;">
         <h1 data-i18n="settings">SETTINGS</h1>
-        <div class="settings-content" style="background: rgba(0,0,0,0.8); padding: 2rem; border-radius: 10px; border: 1px solid #444; width: 100%; max-width: 500px; display: flex; flex-direction: column; gap: 1.5rem;">
+        <div class="settings-content" style="background: rgba(0,0,0,0.8); padding: 2rem; border-radius: 10px; border: 1px solid #444; width: 100%; max-width: 500px; max-height: 70vh; overflow-y: auto; display: flex; flex-direction: column; gap: 1.5rem;">
           
           <!-- Sensitivity -->
           <div class="setting-group">
@@ -170,8 +170,10 @@
             </div>
           </div>
           
+          <div style="display: flex; justify-content: center; margin-top: 1rem;">
+            <button id="btn-close-settings" class="btn-menu" data-i18n="close">CLOSE</button>
+          </div>
         </div>
-        <button id="btn-close-settings" class="btn-menu" style="margin-top: 2rem;" data-i18n="close">CLOSE</button>
       </div>
 
     </div>
