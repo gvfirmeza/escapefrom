@@ -33,6 +33,20 @@ export class UIManager {
     document.getElementById('btn-restart-lose').addEventListener('click', () => {
       stateManager.setState(GameState.PLAYING);
     });
+    
+    document.getElementById('btn-revive').addEventListener('click', () => {
+      if (window.bridge && bridge.advertisement) {
+        bridge.advertisement.showRewarded({
+          onRewarded: () => {
+            // Revive state change handled by Game.js via a custom event or callback
+            window.dispatchEvent(new CustomEvent('revive_player'));
+            stateManager.setState(GameState.PLAYING);
+          },
+          onClosed: () => {},
+          onFailed: () => {}
+        });
+      }
+    });
 
     document.getElementById('pause-screen').addEventListener('click', (e) => {
       // Don't unpause if clicking a button
@@ -98,7 +112,8 @@ export class UIManager {
         find_exit_obj: "FIND THE EXIT",
         enable_jumpscares: "Enable Jumpscares",
         enable_flashing: "Enable Flashing Lights",
-        rotate_screen: "PLEASE ROTATE YOUR DEVICE"
+        rotate_screen: "PLEASE ROTATE YOUR DEVICE",
+        revive: "WATCH AD TO REVIVE"
       },
       pt: {
         warning: "Aviso: Contém luzes piscantes e sons altos.",
@@ -130,7 +145,8 @@ export class UIManager {
         find_exit_obj: "ENCONTRE A SAÍDA",
         enable_jumpscares: "Ativar Jumpscares",
         enable_flashing: "Ativar Luzes Piscantes",
-        rotate_screen: "POR FAVOR, GIRE A TELA"
+        rotate_screen: "POR FAVOR, GIRE A TELA",
+        revive: "ASSISTIR ANÚNCIO PARA REVIVER"
       },
       es: {
         warning: "Aviso: Contiene luces intermitentes y sonidos fuertes.",
@@ -162,7 +178,8 @@ export class UIManager {
         find_exit_obj: "ENCUENTRA LA SALIDA",
         enable_jumpscares: "Activar Jumpscares",
         enable_flashing: "Activar Luces Parpadeantes",
-        rotate_screen: "POR FAVOR, GIRE LA PANTALLA"
+        rotate_screen: "POR FAVOR, GIRE LA PANTALLA",
+        revive: "VER ANUNCIO PARA REVIVIR"
       },
       fr: {
         warning: "Avertissement: Contient des lumières clignotantes et des sons forts.",
@@ -194,7 +211,8 @@ export class UIManager {
         find_exit_obj: "TROUVEZ LA SORTIE",
         enable_jumpscares: "Activer Jumpscares",
         enable_flashing: "Activer Lumières Clignotantes",
-        rotate_screen: "VEUILLEZ TOURNER L'ÉCRAN"
+        rotate_screen: "VEUILLEZ TOURNER L'ÉCRAN",
+        revive: "REGARDER LA PUB POUR REVIVRE"
       }
     };
     
@@ -225,6 +243,14 @@ export class UIManager {
       document.addEventListener('click', () => {
         langOptions.classList.add('select-hide');
       });
+    }
+    
+    // Auto-sync language with Playgama SDK if available
+    if (window.bridge && window.bridge.platform && window.bridge.platform.language) {
+      const bridgeLang = window.bridge.platform.language.toLowerCase().substring(0, 2);
+      if (this.translations[bridgeLang]) {
+        this.currentLang = bridgeLang;
+      }
     }
     
     this.setLanguage(this.currentLang);
@@ -260,6 +286,23 @@ export class UIManager {
         } else {
           element.classList.remove('active');
         }
+      }
+    }
+    
+    // Manage Revive Button visibility
+    if (activeState === GameState.DEFEAT) {
+      const btnRevive = document.getElementById('btn-revive');
+      if (btnRevive && window.bridge && window.bridge.advertisement && window.bridge.advertisement.isRewardedSupported) {
+        btnRevive.style.display = 'inline-flex';
+      }
+    }
+    
+    // Manage Banners
+    if (window.bridge && window.bridge.advertisement) {
+      if (activeState === GameState.MAIN_MENU || activeState === GameState.PAUSED) {
+        bridge.advertisement.showBanner('bottom');
+      } else {
+        bridge.advertisement.hideBanner();
       }
     }
     

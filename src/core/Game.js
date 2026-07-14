@@ -84,6 +84,26 @@ export class Game {
     // Audio
     this.audioManager = new AudioManager(this.player.camera);
     
+    // Playgama Bridge Ad Listeners
+    if (window.bridge && window.bridge.advertisement) {
+      window.bridge.advertisement.on('interstitial_state_changed', state => {
+        if (state === 'opened') {
+          if (this.audioManager && this.audioManager.audioContext) {
+            this.audioManager.audioContext.suspend();
+          }
+        } else if (state === 'closed' || state === 'failed') {
+          if (this.audioManager && this.audioManager.audioContext && stateManager.getState() !== GameState.PAUSED) {
+            this.audioManager.audioContext.resume();
+          }
+        }
+      });
+    }
+    
+    // Revive Listener
+    window.addEventListener('revive_player', () => {
+      this.startNewGame(true);
+    });
+    
     // Start loop
     this.update();
   }
@@ -95,6 +115,13 @@ export class Game {
 
     if (newState === GameState.PLAYING && (oldState === GameState.VICTORY || oldState === GameState.DEFEAT || oldState === GameState.TUTORIAL)) {
       stateManager.setState(GameState.LOADING);
+    }
+    
+    // Trigger ad on natural breakpoints
+    if (newState === GameState.VICTORY || newState === GameState.DEFEAT) {
+      if (window.bridge && bridge.advertisement) {
+        bridge.advertisement.showInterstitial();
+      }
     }
     
     if (newState === GameState.LOADING) {
@@ -128,7 +155,7 @@ export class Game {
     }
   }
 
-  startNewGame() {
+  startNewGame(preserveInventory = false) {
     // Clear old scene
     this.sceneManager.clear();
     
@@ -140,7 +167,10 @@ export class Game {
     }
     
     this.isJumpscareActive = false;
-    this.keysCollected = 0;
+    
+    if (!preserveInventory) {
+      this.keysCollected = 0;
+    }
     this.totalKeys = 5;
     
     this.uiManager.updateKeys(this.keysCollected, this.totalKeys, isLevel2);
@@ -288,6 +318,7 @@ export class Game {
         if (this.keysCollected >= this.totalKeys) {
           if (this.currentLevelIndex === 1) {
             this.currentLevelIndex = 2;
+            if (window.bridge) bridge.storage.set({ level: 2 });
             stateManager.setState(GameState.LOADING);
           } else {
             stateManager.setState(GameState.VICTORY);

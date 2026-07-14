@@ -3,8 +3,11 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
-    <title>The Backrooms - Level 0</title>
+    <title>THE BACKROOMS</title>
     <link rel="stylesheet" href="/src/style.css" />
+    
+    <!-- Playgama Bridge SDK -->
+    <script src="https://bridge.playgama.com/v2/stable/playgama-bridge.js"></script>
   </head>
   <body>
     <!-- The WebGL Canvas will be injected here or attached to body -->
@@ -95,6 +98,7 @@
       <div id="defeat-screen" class="screen">
         <h1 data-i18n="caught">VOCÊ FOI PEGO</h1>
         <p data-i18n="it_found_you">Ele te achou.</p>
+        <button id="btn-revive" data-i18n="revive" style="background-color: #9747ff; color: white; display: none;">ASSISTIR ANÚNCIO PARA REVIVER</button>
         <button id="btn-restart-lose" data-i18n="restart">REINICIAR</button>
         <button class="btn-menu" data-i18n="return_menu">VOLTAR AO MENU</button>
       </div>
