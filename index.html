@@ -47,7 +47,10 @@
             </label>
           </div>
           
-          <button id="btn-start" data-i18n="start">INICIAR EXPLORAÇÃO</button>
+          <div style="display: flex; gap: 1rem; justify-content: center;">
+            <button id="btn-start" data-i18n="start">INICIAR EXPLORAÇÃO</button>
+            <button id="btn-settings-main" class="btn-menu" data-i18n="settings">SETTINGS</button>
+          </div>
           
           <div class="controls-info">
             <h3>CONTROLS</h3>
@@ -113,7 +116,10 @@
       <div id="pause-screen" class="screen">
         <h1 data-i18n="paused">PAUSADO</h1>
         <p data-i18n="resume">Clique para voltar.</p>
-        <button class="btn-menu" data-i18n="return_menu" style="margin-top: 5rem; z-index: 10;">VOLTAR AO MENU</button>
+        <div style="display: flex; gap: 1rem; margin-top: 5rem; z-index: 10; justify-content: center;">
+          <button id="btn-settings-pause" class="btn-menu" data-i18n="settings">SETTINGS</button>
+          <button class="btn-menu" data-i18n="return_menu">VOLTAR AO MENU</button>
+        </div>
       </div>
 
       <!-- Rotate Screen -->
@@ -121,6 +127,35 @@
         <div class="phone-icon"></div>
         <h2 style="color: white; margin-top: 2rem;" data-i18n="rotate_screen">PLEASE ROTATE YOUR DEVICE</h2>
       </div>
+
+      <!-- Settings Screen -->
+      <div id="settings-screen" class="screen" style="z-index: 200;">
+        <h1 data-i18n="settings">SETTINGS</h1>
+        <div class="settings-content" style="background: rgba(0,0,0,0.8); padding: 2rem; border-radius: 10px; border: 1px solid #444; width: 100%; max-width: 500px; display: flex; flex-direction: column; gap: 1.5rem;">
+          
+          <!-- Sensitivity -->
+          <div class="setting-group">
+            <label style="color: #ccc; font-family: monospace; font-size: 1.2rem; display: block; margin-bottom: 0.5rem;" data-i18n="camera_sensitivity">Camera Sensitivity</label>
+            <div style="display: flex; align-items: center; gap: 1rem;">
+              <input type="range" id="sensitivity-slider" min="0.0005" max="0.005" step="0.0001" value="0.002" style="flex: 1;">
+              <span id="sensitivity-value" style="color: white; font-family: monospace; width: 50px; text-align: right;">0.002</span>
+            </div>
+          </div>
+          
+          <!-- Graphics Quality -->
+          <div class="setting-group">
+            <label style="color: #ccc; font-family: monospace; font-size: 1.2rem; display: block; margin-bottom: 0.5rem;" data-i18n="graphics_quality">Graphics Quality</label>
+            <div style="display: flex; gap: 0.5rem;" id="quality-buttons">
+              <button class="btn-quality" data-quality="low">Low</button>
+              <button class="btn-quality" data-quality="medium">Medium</button>
+              <button class="btn-quality active" data-quality="high">High</button>
+            </div>
+          </div>
+          
+        </div>
+        <button id="btn-close-settings" class="btn-menu" style="margin-top: 2rem;" data-i18n="close">CLOSE</button>
+      </div>
+
     </div>
     
     <!-- Mobile Controls (hidden by default) -->

@@ -56,9 +56,63 @@ export class UIManager {
     });
 
     // Return to menu buttons
-    document.querySelectorAll('.btn-menu').forEach(btn => {
+    document.querySelectorAll('.btn-menu:not(#btn-settings-main):not(#btn-settings-pause):not(#btn-close-settings)').forEach(btn => {
       btn.addEventListener('click', () => {
         stateManager.setState(GameState.MAIN_MENU);
+      });
+    });
+
+    // Settings logic
+    this.settingsScreen = document.getElementById('settings-screen');
+    this.sensitivitySlider = document.getElementById('sensitivity-slider');
+    this.sensitivityValue = document.getElementById('sensitivity-value');
+    this.qualityBtns = document.querySelectorAll('.btn-quality');
+    
+    // Load settings
+    this.settings = {
+      sensitivity: parseFloat(localStorage.getItem('br_sensitivity')) || 0.002,
+      quality: localStorage.getItem('br_quality') || ( ('ontouchstart' in window) ? 'low' : 'high' )
+    };
+    
+    // Apply loaded settings to UI
+    this.sensitivitySlider.value = this.settings.sensitivity;
+    this.sensitivityValue.textContent = this.settings.sensitivity;
+    this.qualityBtns.forEach(b => {
+      if (b.dataset.quality === this.settings.quality) b.classList.add('active');
+      else b.classList.remove('active');
+    });
+
+    // Dispatch initial event after a short delay to allow components to listen
+    setTimeout(() => {
+      window.dispatchEvent(new CustomEvent('settings_changed', { detail: this.settings }));
+    }, 100);
+
+    const openSettings = (e) => {
+      e.stopPropagation();
+      this.settingsScreen.classList.add('active');
+    };
+    
+    document.getElementById('btn-settings-main').addEventListener('click', openSettings);
+    document.getElementById('btn-settings-pause').addEventListener('click', openSettings);
+    
+    document.getElementById('btn-close-settings').addEventListener('click', () => {
+      this.settingsScreen.classList.remove('active');
+    });
+
+    this.sensitivitySlider.addEventListener('input', (e) => {
+      this.settings.sensitivity = parseFloat(e.target.value);
+      this.sensitivityValue.textContent = this.settings.sensitivity;
+      localStorage.setItem('br_sensitivity', this.settings.sensitivity);
+      window.dispatchEvent(new CustomEvent('settings_changed', { detail: this.settings }));
+    });
+
+    this.qualityBtns.forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        this.qualityBtns.forEach(b => b.classList.remove('active'));
+        e.target.classList.add('active');
+        this.settings.quality = e.target.dataset.quality;
+        localStorage.setItem('br_quality', this.settings.quality);
+        window.dispatchEvent(new CustomEvent('settings_changed', { detail: this.settings }));
       });
     });
 

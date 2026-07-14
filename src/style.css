@@ -682,3 +682,29 @@ body.safe-mode #find-exit-text {
   50% { transform: rotate(90deg); }
   100% { transform: rotate(90deg); }
 }
+
+/* Settings Styles */
+.btn-quality {
+  flex: 1;
+  padding: 10px;
+  background: transparent;
+  border: 2px solid #555;
+  color: #ccc;
+  font-family: monospace;
+  font-size: 1rem;
+  cursor: pointer;
+  border-radius: 5px;
+  transition: all 0.2s;
+}
+
+.btn-quality:hover {
+  background: rgba(255, 255, 255, 0.1);
+  border-color: #888;
+}
+
+.btn-quality.active {
+  background: #9747ff;
+  border-color: #9747ff;
+  color: white;
+  font-weight: bold;
+}

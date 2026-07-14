@@ -25,6 +25,11 @@ export class MovementController {
     
     // Debug
     this.isDebugMode = false;
+    
+    // Settings listener
+    window.addEventListener('settings_changed', (e) => {
+      this.sensitivity = e.detail.sensitivity;
+    });
   }
 
   setDebugMode(enabled) {
