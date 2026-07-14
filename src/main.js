@@ -13,13 +13,21 @@ window.addEventListener('DOMContentLoaded', () => {
               game.currentLevelIndex = parseInt(data);
             }
             game.init();
-            bridge.platform.sendMessage('game_ready');
+            requestAnimationFrame(() => {
+              requestAnimationFrame(() => {
+                bridge.platform.sendMessage('game_ready');
+              });
+            });
           })
           .catch(e => {
             console.error("Storage get failed", e);
             const game = new Game();
             game.init();
-            bridge.platform.sendMessage('game_ready');
+            requestAnimationFrame(() => {
+              requestAnimationFrame(() => {
+                bridge.platform.sendMessage('game_ready');
+              });
+            });
           });
       })
       .catch(error => {
