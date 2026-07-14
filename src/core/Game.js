@@ -97,6 +97,21 @@ export class Game {
           }
         }
       });
+      
+      window.bridge.advertisement.on('rewarded_state_changed', state => {
+        if (state === 'opened') {
+          if (this.audioManager && this.audioManager.audioContext) {
+            this.audioManager.audioContext.suspend();
+          }
+        } else if (state === 'rewarded') {
+          window.dispatchEvent(new CustomEvent('revive_player'));
+          stateManager.setState(GameState.PLAYING);
+        } else if (state === 'closed' || state === 'failed') {
+          if (this.audioManager && this.audioManager.audioContext && stateManager.getState() !== GameState.PAUSED) {
+            this.audioManager.audioContext.resume();
+          }
+        }
+      });
     }
     
     // Revive Listener

@@ -36,15 +36,7 @@ export class UIManager {
     
     document.getElementById('btn-revive').addEventListener('click', () => {
       if (window.bridge && bridge.advertisement) {
-        bridge.advertisement.showRewarded({
-          onRewarded: () => {
-            // Revive state change handled by Game.js via a custom event or callback
-            window.dispatchEvent(new CustomEvent('revive_player'));
-            stateManager.setState(GameState.PLAYING);
-          },
-          onClosed: () => {},
-          onFailed: () => {}
-        });
+        bridge.advertisement.showRewarded('revive');
       }
     });
 
