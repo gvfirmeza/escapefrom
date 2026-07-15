@@ -15,7 +15,9 @@ window.addEventListener('DOMContentLoaded', () => {
             game.init().then(() => {
               requestAnimationFrame(() => {
                 requestAnimationFrame(() => {
-                  bridge.platform.sendMessage('game_ready');
+                  setTimeout(() => {
+                    bridge.platform.sendMessage('game_ready');
+                  }, 500);
                 });
               });
             });
@@ -26,7 +28,9 @@ window.addEventListener('DOMContentLoaded', () => {
             game.init().then(() => {
               requestAnimationFrame(() => {
                 requestAnimationFrame(() => {
-                  bridge.platform.sendMessage('game_ready');
+                  setTimeout(() => {
+                    bridge.platform.sendMessage('game_ready');
+                  }, 500);
                 });
               });
             });
