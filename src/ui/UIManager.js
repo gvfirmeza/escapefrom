@@ -71,6 +71,7 @@ export class UIManager {
       toggleRun: localStorage.getItem('br_run') === 'true',
       jumpscares: localStorage.getItem('br_jumpscares') !== 'false',
       flashingLights: localStorage.getItem('br_flashing') !== 'false',
+      mute: localStorage.getItem('br_mute') === 'true',
     };
     
     this.applySettings();
@@ -152,6 +153,14 @@ export class UIManager {
     if (jumpscareToggle) {
       jumpscareToggle.addEventListener('change', (e) => {
         this.settings.jumpscares = e.target.checked;
+        this.saveSettings();
+      });
+    }
+    
+    const muteToggle = document.getElementById('toggle-mute');
+    if (muteToggle) {
+      muteToggle.addEventListener('change', (e) => {
+        this.settings.mute = e.target.checked;
         this.saveSettings();
       });
     }
@@ -425,6 +434,11 @@ export class UIManager {
       jumpscareToggle.checked = this.settings.jumpscares;
     }
     
+    const muteToggle = document.getElementById('toggle-mute');
+    if (muteToggle) {
+      muteToggle.checked = this.settings.mute;
+    }
+    
     window.dispatchEvent(new CustomEvent('settings_changed', { detail: this.settings }));
   }
 
@@ -436,6 +450,7 @@ export class UIManager {
     localStorage.setItem('br_run', this.settings.toggleRun);
     localStorage.setItem('br_jumpscares', this.settings.jumpscares);
     localStorage.setItem('br_flashing', this.settings.flashingLights);
+    localStorage.setItem('br_mute', this.settings.mute);
     
     if (window.bridge) {
       bridge.storage.set('settings', this.settings).catch(e => console.warn("Failed to sync settings to cloud", e));

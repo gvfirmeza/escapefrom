@@ -83,6 +83,9 @@ export class Game {
     
     // Audio
     this.audioManager = new AudioManager(this.player.camera);
+    if (this.uiManager && this.uiManager.settings) {
+      this.audioManager.setMute(this.uiManager.settings.mute);
+    }
     
     // Playgama Bridge Ad Listeners
     if (window.bridge && window.bridge.advertisement) {
@@ -116,19 +119,19 @@ export class Game {
     
     // Playgama Bridge Platform Listeners
     if (window.bridge && window.bridge.platform) {
-      window.bridge.platform.on('pause', () => {
-        if (stateManager.getState() === GameState.PLAYING) {
-          stateManager.setState(GameState.PAUSED);
-        }
-        if (this.audioManager && this.audioManager.audioContext) {
-          this.audioManager.audioContext.suspend();
-        }
-      });
-      
-      window.bridge.platform.on('resume', () => {
-        if (this.audioManager && this.audioManager.audioContext && stateManager.getState() !== GameState.PAUSED) {
-          if (window.bridge.platform.isAudioEnabled !== false) {
-            this.audioManager.audioContext.resume();
+      window.bridge.platform.on('pause_state_changed', isPaused => {
+        if (isPaused) {
+          if (stateManager.getState() === GameState.PLAYING) {
+            stateManager.setState(GameState.PAUSED);
+          }
+          if (this.audioManager && this.audioManager.audioContext) {
+            this.audioManager.audioContext.suspend();
+          }
+        } else {
+          if (this.audioManager && this.audioManager.audioContext && stateManager.getState() !== GameState.PAUSED) {
+            if (window.bridge.platform.isAudioEnabled !== false && (!this.uiManager || !this.uiManager.settings.mute)) {
+              this.audioManager.audioContext.resume();
+            }
           }
         }
       });

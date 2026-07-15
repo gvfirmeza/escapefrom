@@ -13,6 +13,20 @@ export class AudioManager {
     this.enemyStepPhase = 0;
     this.playerStepPhase = 0;
     this.isInitialized = false;
+    
+    window.addEventListener('settings_changed', (e) => {
+      if (e.detail && typeof e.detail.mute !== 'undefined') {
+        this.setMute(e.detail.mute);
+      }
+    });
+  }
+  
+  setMute(isMuted) {
+    if (isMuted) {
+      this.listener.setMasterVolume(0);
+    } else {
+      this.listener.setMasterVolume(1);
+    }
   }
 
   init() {

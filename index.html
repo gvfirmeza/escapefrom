@@ -47,7 +47,7 @@
             </label>
           </div>
           
-          <div style="display: flex; gap: 1rem; justify-content: center;">
+          <div style="display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap;">
             <button id="btn-start" data-i18n="start">INICIAR EXPLORAÇÃO</button>
             <button id="btn-settings-main" class="btn-menu" data-i18n="settings">SETTINGS</button>
           </div>
@@ -160,11 +160,17 @@
           </div>
           
           <!-- Toggle Run Mode -->
-          <div class="setting-group" style="display: flex; align-items: center; gap: 1rem;">
+          <div class="setting-group" style="display: flex; align-items: center; gap: 1rem; flex-wrap: wrap;">
             <label class="custom-checkbox">
               <input type="checkbox" id="toggle-run-mode">
               <span class="checkmark"></span>
-              <span style="color: #ccc; font-family: monospace; font-size: 1.2rem;" data-i18n="toggle_run">Toggle Run Mode</span>
+              <span style="color: #ccc; font-family: monospace; font-size: 1.2rem;" data-i18n="toggle_run">Toggle Correr</span>
+            </label>
+            
+            <label class="custom-checkbox">
+              <input type="checkbox" id="toggle-mute">
+              <span class="checkmark"></span>
+              <span style="color: #ccc; font-family: monospace; font-size: 1.2rem;" data-i18n="mute_audio">Mute Audio</span>
             </label>
           </div>
           
