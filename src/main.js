@@ -17,7 +17,7 @@ window.addEventListener('DOMContentLoaded', () => {
                 requestAnimationFrame(() => {
                   setTimeout(() => {
                     bridge.platform.sendMessage('game_ready');
-                  }, 500);
+                  }, 2000);
                 });
               });
             });
@@ -30,7 +30,7 @@ window.addEventListener('DOMContentLoaded', () => {
                 requestAnimationFrame(() => {
                   setTimeout(() => {
                     bridge.platform.sendMessage('game_ready');
-                  }, 500);
+                  }, 2000);
                 });
               });
             });

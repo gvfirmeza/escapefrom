@@ -8,7 +8,8 @@ export class Renderer {
     
     this.instance = new THREE.WebGLRenderer({
       antialias: !this.isMobile,
-      powerPreference: 'high-performance'
+      powerPreference: 'high-performance',
+      preserveDrawingBuffer: true
     });
     
     // Default ratio (will be overridden by settings event if fired)
