@@ -159,6 +159,9 @@ export class Game {
       stateManager.setState(GameState.PLAYING);
     });
     
+    // Generate the initial level in the background so the canvas isn't black during main menu
+    this.startNewGame(false, false);
+    
     // Start loop
     this.update();
   }
@@ -210,7 +213,7 @@ export class Game {
     }
   }
 
-  startNewGame(preserveInventory = false) {
+  startNewGame(preserveInventory = false, forcePlayingState = true) {
     // Clear old scene
     this.sceneManager.clear();
     
@@ -259,7 +262,9 @@ export class Game {
       this.sceneManager.add(this.entity.mesh);
       
       // Transition to playing
-      stateManager.setState(GameState.PLAYING);
+      if (forcePlayingState) {
+        stateManager.setState(GameState.PLAYING);
+      }
     }, 50);
   }
 
