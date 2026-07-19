@@ -30,6 +30,9 @@ export class Game {
     this.entity = null;
     this.isDebugMode = false;
     this.isJumpscareActive = false;
+    
+    this.frameCount = 0;
+    this.isGameReadySent = false;
 
     // Bind loop
     this.update = this.update.bind(this);
@@ -410,6 +413,18 @@ export class Game {
     
     // Always render unless paused? We can render anyway so the background stays visible
     this.renderer.render(this.sceneManager.scene, this.player.camera);
+    
+    // Ensure the game_ready is dispatched only after the scene has been rendered a few times,
+    // guaranteeing that shaders are compiled and the canvas is fully painted by the browser.
+    if (!this.isGameReadySent) {
+      this.frameCount++;
+      if (this.frameCount > 10) {
+        this.isGameReadySent = true;
+        if (window.bridge && window.bridge.platform) {
+          window.bridge.platform.sendMessage('game_ready');
+        }
+      }
+    }
   }
 
   collectKey(keyObj) {

@@ -12,28 +12,12 @@ window.addEventListener('DOMContentLoaded', () => {
             if (data !== undefined && data !== null) {
               game.currentLevelIndex = parseInt(data);
             }
-            game.init().then(() => {
-              requestAnimationFrame(() => {
-                requestAnimationFrame(() => {
-                  setTimeout(() => {
-                    bridge.platform.sendMessage('game_ready');
-                  }, 2000);
-                });
-              });
-            });
+            game.init();
           })
           .catch(e => {
             console.error("Storage get failed", e);
             const game = new Game();
-            game.init().then(() => {
-              requestAnimationFrame(() => {
-                requestAnimationFrame(() => {
-                  setTimeout(() => {
-                    bridge.platform.sendMessage('game_ready');
-                  }, 2000);
-                });
-              });
-            });
+            game.init();
           });
       })
       .catch(error => {
