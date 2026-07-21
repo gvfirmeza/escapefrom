@@ -375,8 +375,8 @@ export class AudioManager {
       // Scale intensity from 0 (at 15 units) to 1 (at 0 units)
       const intensity = 1.0 - (distToEnemy / maxDist);
       
-      // Target volume: exponential curve up to 1.5
-      const targetVol = Math.pow(intensity, 2) * 1.5; 
+      // Target volume: exponential curve up to 0.6 (reduced from 1.5)
+      const targetVol = Math.pow(intensity, 2) * 0.6; 
       // Target rate: linear curve up to 1.6x speed
       const targetRate = 1.0 + (intensity * 0.6);
       // Distortion amount: up to 100

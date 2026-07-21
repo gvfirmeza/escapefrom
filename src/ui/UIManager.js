@@ -161,6 +161,17 @@ export class UIManager {
     if (muteToggle) {
       muteToggle.addEventListener('change', (e) => {
         this.settings.mute = e.target.checked;
+        const toggleMain = document.getElementById('toggle-mute-main');
+        if (toggleMain) toggleMain.checked = e.target.checked;
+        this.saveSettings();
+      });
+    }
+    
+    const muteToggleMain = document.getElementById('toggle-mute-main');
+    if (muteToggleMain) {
+      muteToggleMain.addEventListener('change', (e) => {
+        this.settings.mute = e.target.checked;
+        if (muteToggle) muteToggle.checked = e.target.checked;
         this.saveSettings();
       });
     }
@@ -437,6 +448,10 @@ export class UIManager {
     const muteToggle = document.getElementById('toggle-mute');
     if (muteToggle) {
       muteToggle.checked = this.settings.mute;
+    }
+    const muteToggleMain = document.getElementById('toggle-mute-main');
+    if (muteToggleMain) {
+      muteToggleMain.checked = this.settings.mute;
     }
     
     window.dispatchEvent(new CustomEvent('settings_changed', { detail: this.settings }));

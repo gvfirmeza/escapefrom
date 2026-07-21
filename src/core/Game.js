@@ -264,6 +264,11 @@ export class Game {
       this.entity.spawn(entitySpawn);
       this.sceneManager.add(this.entity.mesh);
       
+      // Pre-compile shaders to avoid lag spike on the first frame of gameplay
+      if (this.renderer && this.renderer.instance) {
+        this.renderer.instance.compile(this.sceneManager.scene, this.player.camera);
+      }
+      
       // Transition to playing
       if (forcePlayingState) {
         stateManager.setState(GameState.PLAYING);
