@@ -167,12 +167,31 @@ export class UIManager {
       });
     }
     
-    const muteToggleMain = document.getElementById('toggle-mute-main');
+    const muteToggleMain = document.getElementById('btn-mute-main');
     if (muteToggleMain) {
-      muteToggleMain.addEventListener('change', (e) => {
-        this.settings.mute = e.target.checked;
-        if (muteToggle) muteToggle.checked = e.target.checked;
+      muteToggleMain.addEventListener('click', (e) => {
+        e.preventDefault();
+        this.settings.mute = !this.settings.mute;
+        if (muteToggle) muteToggle.checked = this.settings.mute;
         this.saveSettings();
+        
+        const soundOn = document.getElementById('icon-sound-on');
+        const soundOff = document.getElementById('icon-sound-off');
+        if (soundOn && soundOff) {
+          soundOn.style.display = this.settings.mute ? 'none' : 'block';
+          soundOff.style.display = this.settings.mute ? 'block' : 'none';
+        }
+      });
+      // Add hover effect since we added inline styles
+      muteToggleMain.addEventListener('mouseover', () => {
+        muteToggleMain.style.background = 'var(--text-color)';
+        muteToggleMain.style.color = '#000';
+        muteToggleMain.style.boxShadow = '0 0 15px var(--text-color)';
+      });
+      muteToggleMain.addEventListener('mouseout', () => {
+        muteToggleMain.style.background = 'transparent';
+        muteToggleMain.style.color = 'var(--text-color)';
+        muteToggleMain.style.boxShadow = 'none';
       });
     }
     
@@ -449,9 +468,12 @@ export class UIManager {
     if (muteToggle) {
       muteToggle.checked = this.settings.mute;
     }
-    const muteToggleMain = document.getElementById('toggle-mute-main');
-    if (muteToggleMain) {
-      muteToggleMain.checked = this.settings.mute;
+    const muteToggleMain = document.getElementById('btn-mute-main');
+    const soundOn = document.getElementById('icon-sound-on');
+    const soundOff = document.getElementById('icon-sound-off');
+    if (muteToggleMain && soundOn && soundOff) {
+      soundOn.style.display = this.settings.mute ? 'none' : 'block';
+      soundOff.style.display = this.settings.mute ? 'block' : 'none';
     }
     
     window.dispatchEvent(new CustomEvent('settings_changed', { detail: this.settings }));

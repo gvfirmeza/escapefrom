@@ -69,7 +69,7 @@ export class AudioManager {
       
       this.musicSource.connect(this.musicDistortion);
       this.musicDistortion.connect(this.musicGain);
-      this.musicGain.connect(this.audioContext.destination);
+      this.musicGain.connect(this.listener.getInput());
       
       this.musicSource.start();
     } catch (e) {
@@ -123,7 +123,7 @@ export class AudioManager {
     gain.gain.value = 0.2;
     
     osc.connect(gain);
-    gain.connect(this.audioContext.destination);
+    gain.connect(this.listener.getInput());
     
     osc.start();
     lfo.start();
@@ -148,7 +148,7 @@ export class AudioManager {
     
     osc.connect(filter);
     filter.connect(gain);
-    gain.connect(this.audioContext.destination);
+    gain.connect(this.listener.getInput());
     
     osc.start();
     
@@ -198,7 +198,7 @@ export class AudioManager {
     
     source.connect(filter);
     filter.connect(gain);
-    gain.connect(this.audioContext.destination);
+    gain.connect(this.listener.getInput());
     
     source.start();
   }
@@ -220,7 +220,7 @@ export class AudioManager {
     gain.gain.exponentialRampToValueAtTime(0.001, this.audioContext.currentTime + 0.6);
     
     osc.connect(gain);
-    gain.connect(this.audioContext.destination);
+    gain.connect(this.listener.getInput());
     
     osc.start();
     osc.stop(this.audioContext.currentTime + 0.7);
@@ -240,7 +240,7 @@ export class AudioManager {
     gain.gain.exponentialRampToValueAtTime(0.01, this.audioContext.currentTime + 0.05);
     
     osc.connect(gain);
-    gain.connect(this.audioContext.destination);
+    gain.connect(this.listener.getInput());
     
     osc.start();
     osc.stop(this.audioContext.currentTime + 0.05);
@@ -299,7 +299,7 @@ export class AudioManager {
       gain.gain.value = 1.0;
       
       source.connect(gain);
-      gain.connect(this.audioContext.destination);
+      gain.connect(this.listener.getInput());
       source.start();
     } else {
       // Fallback if file not found
@@ -314,7 +314,7 @@ export class AudioManager {
       gain.gain.exponentialRampToValueAtTime(0.01, this.audioContext.currentTime + 0.5);
       
       osc.connect(gain);
-      gain.connect(this.audioContext.destination);
+      gain.connect(this.listener.getInput());
       osc.start();
       osc.stop(this.audioContext.currentTime + 0.5);
     }
@@ -347,7 +347,7 @@ export class AudioManager {
     osc.connect(dist);
     dist.connect(filter);
     filter.connect(gain);
-    gain.connect(this.audioContext.destination);
+    gain.connect(this.listener.getInput());
     
     osc.start();
     osc.stop(this.audioContext.currentTime + 1.0);
@@ -422,7 +422,7 @@ export class AudioManager {
     
     osc.connect(gain);
     osc2.connect(gain);
-    gain.connect(this.audioContext.destination);
+    gain.connect(this.listener.getInput());
     
     osc.start();
     osc2.start();
