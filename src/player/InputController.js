@@ -286,7 +286,7 @@ export class InputController {
 
   lock() {
     if (!this.isMobile) {
-      document.body.requestPointerLock();
+      try { document.body.requestPointerLock(); } catch(e) {}
     } else {
       this.isLocked = true;
     }
