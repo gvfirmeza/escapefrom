@@ -577,6 +577,31 @@ export class UIManager {
         bridge.advertisement.hideBanner();
       }
     }
+
+    // Handle browser pointer lock cooldown
+    if (activeState === GameState.PAUSED) {
+      const btnResume = document.getElementById('btn-resume');
+      const isMobile = ('ontouchstart' in window) || navigator.maxTouchPoints > 0;
+      if (btnResume && !isMobile) {
+        btnResume.disabled = true;
+        btnResume.style.opacity = '0.5';
+        btnResume.style.cursor = 'not-allowed';
+        const originalText = btnResume.innerHTML;
+        const waitText = this.currentLang === 'pt' ? 'AGUARDE...' : 'WAIT...';
+        btnResume.innerHTML = waitText;
+        
+        setTimeout(() => {
+          btnResume.disabled = false;
+          btnResume.style.opacity = '1';
+          btnResume.style.cursor = 'pointer';
+          if (this.translations[this.currentLang] && this.translations[this.currentLang].resume_btn) {
+            btnResume.innerHTML = this.translations[this.currentLang].resume_btn;
+          } else {
+            btnResume.innerHTML = originalText;
+          }
+        }, 1300);
+      }
+    }
     
     // Manage mobile controls
     const isMobile = ('ontouchstart' in window) || (navigator.maxTouchPoints > 0);
