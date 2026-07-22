@@ -49,11 +49,11 @@ export class UIManager {
       }
     });
 
-    document.getElementById('pause-screen').addEventListener('click', (e) => {
-      // Don't unpause if clicking a button
-      if (e.target.tagName !== 'BUTTON') {
-        stateManager.setState(GameState.PLAYING);
+    document.getElementById('btn-resume').addEventListener('click', () => {
+      if (!('ontouchstart' in window) && navigator.maxTouchPoints === 0) {
+        document.body.requestPointerLock();
       }
+      stateManager.setState(GameState.PLAYING);
     });
 
     // Return to menu buttons
@@ -230,6 +230,7 @@ export class UIManager {
         it_found_you: "It found you.",
         paused: "PAUSED",
         resume: "Click to resume.",
+        resume_btn: "RESUME GAME",
         keys: "Keys: {0} / {1}",
         missing_keys: "You need {0} more keys!",
         valves: "Valves: {0} / {1}",
@@ -275,6 +276,7 @@ export class UIManager {
         it_found_you: "Ele te achou.",
         paused: "PAUSADO",
         resume: "Clique para voltar.",
+        resume_btn: "VOLTAR AO JOGO",
         keys: "Chaves: {0} / {1}",
         missing_keys: "Faltam {0} chaves para abrir a porta!",
         valves: "Válvulas: {0} / {1}",
@@ -320,6 +322,7 @@ export class UIManager {
         it_found_you: "Te encontró.",
         paused: "PAUSADO",
         resume: "Haz clic para volver.",
+        resume_btn: "VOLVER AL JUEGO",
         keys: "Llaves: {0} / {1}",
         missing_keys: "¡Faltan {0} llaves!",
         valves: "Válvulas: {0} / {1}",
@@ -365,6 +368,7 @@ export class UIManager {
         it_found_you: "Il vous a trouvé.",
         paused: "EN PAUSE",
         resume: "Cliquez pour reprendre.",
+        resume_btn: "RETOURNER AU JEU",
         keys: "Clés: {0} / {1}",
         missing_keys: "Il vous manque {0} clés!",
         valves: "Vannes: {0} / {1}",

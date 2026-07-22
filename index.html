@@ -124,11 +124,10 @@
         <img src="./jumpscare2.png" class="jumpscare-image" id="jumpscare-img-2" alt="Jumpscare" style="display: none;" />
       </div>
       
-      <!-- Pause Screen -->
       <div id="pause-screen" class="screen">
         <h1 data-i18n="paused">PAUSADO</h1>
-        <p data-i18n="resume">Clique para voltar.</p>
-        <div style="display: flex; gap: 1rem; margin-top: 5rem; z-index: 10; justify-content: center;">
+        <div style="display: flex; gap: 1rem; margin-top: 5rem; z-index: 10; justify-content: center; flex-wrap: wrap;">
+          <button id="btn-resume" data-i18n="resume_btn">VOLTAR AO JOGO</button>
           <button id="btn-settings-pause" class="btn-menu" data-i18n="settings">SETTINGS</button>
           <button class="btn-menu" data-i18n="return_menu">VOLTAR AO MENU</button>
         </div>
