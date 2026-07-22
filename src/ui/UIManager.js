@@ -54,7 +54,20 @@ export class UIManager {
 
     document.getElementById('btn-resume').addEventListener('click', (e) => {
       e.stopPropagation();
-      stateManager.setState(GameState.PLAYING);
+      const isMobile = ('ontouchstart' in window) || navigator.maxTouchPoints > 0;
+      if (!isMobile) {
+        try { 
+          const p = document.body.requestPointerLock(); 
+          if (p) {
+             p.catch(() => {
+                 const msg = this.currentLang === 'pt' ? 'Aguarde 1 segundo para voltar...' : 'Wait a second to resume...';
+                 this.showToast(msg);
+             });
+          }
+        } catch(e) {}
+      } else {
+        stateManager.setState(GameState.PLAYING);
+      }
     });
 
     // Return to menu buttons

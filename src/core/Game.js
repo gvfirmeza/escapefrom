@@ -83,6 +83,11 @@ export class Game {
         stateManager.setState(GameState.PAUSED);
       }
     };
+    this.player.input.onLock = () => {
+      if (stateManager.getState() === GameState.PAUSED) {
+        stateManager.setState(GameState.PLAYING);
+      }
+    };
     
     // Audio
     this.audioManager = new AudioManager(this.player.camera);

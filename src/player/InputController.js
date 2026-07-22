@@ -281,12 +281,15 @@ export class InputController {
       this.mouseX = 0;
       this.mouseY = 0;
       this.justLocked = true;
+      if (this.onLock) this.onLock();
     }
   }
 
   lock() {
     if (!this.isMobile) {
-      try { document.body.requestPointerLock(); } catch(e) {}
+      if (!this.isLocked) {
+        try { document.body.requestPointerLock(); } catch(e) {}
+      }
     } else {
       this.isLocked = true;
     }
