@@ -22,21 +22,24 @@ export class UIManager {
       stateManager.setState(GameState.TUTORIAL);
     });
     
-    document.getElementById('btn-start-tutorial').addEventListener('click', () => {
+    document.getElementById('btn-start-tutorial').addEventListener('click', (e) => {
+      e.stopPropagation();
       if (!('ontouchstart' in window) && navigator.maxTouchPoints === 0) {
         try { document.body.requestPointerLock(); } catch(e) {}
       }
       stateManager.setState(GameState.PLAYING);
     });
 
-    document.getElementById('btn-restart-win').addEventListener('click', () => {
+    document.getElementById('btn-restart-win').addEventListener('click', (e) => {
+      e.stopPropagation();
       if (!('ontouchstart' in window) && navigator.maxTouchPoints === 0) {
         try { document.body.requestPointerLock(); } catch(e) {}
       }
       stateManager.setState(GameState.PLAYING);
     });
 
-    document.getElementById('btn-restart-lose').addEventListener('click', () => {
+    document.getElementById('btn-restart-lose').addEventListener('click', (e) => {
+      e.stopPropagation();
       if (!('ontouchstart' in window) && navigator.maxTouchPoints === 0) {
         try { document.body.requestPointerLock(); } catch(e) {}
       }
@@ -49,10 +52,8 @@ export class UIManager {
       }
     });
 
-    document.getElementById('btn-resume').addEventListener('click', () => {
-      if (!('ontouchstart' in window) && navigator.maxTouchPoints === 0) {
-        try { document.body.requestPointerLock(); } catch(e) {}
-      }
+    document.getElementById('btn-resume').addEventListener('click', (e) => {
+      e.stopPropagation();
       stateManager.setState(GameState.PLAYING);
     });
 
