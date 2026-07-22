@@ -23,14 +23,23 @@ export class UIManager {
     });
     
     document.getElementById('btn-start-tutorial').addEventListener('click', () => {
+      if (!('ontouchstart' in window) && navigator.maxTouchPoints === 0) {
+        document.body.requestPointerLock();
+      }
       stateManager.setState(GameState.PLAYING);
     });
 
     document.getElementById('btn-restart-win').addEventListener('click', () => {
+      if (!('ontouchstart' in window) && navigator.maxTouchPoints === 0) {
+        document.body.requestPointerLock();
+      }
       stateManager.setState(GameState.PLAYING);
     });
 
     document.getElementById('btn-restart-lose').addEventListener('click', () => {
+      if (!('ontouchstart' in window) && navigator.maxTouchPoints === 0) {
+        document.body.requestPointerLock();
+      }
       stateManager.setState(GameState.PLAYING);
     });
     

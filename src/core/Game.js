@@ -162,6 +162,13 @@ export class Game {
       stateManager.setState(GameState.PLAYING);
     });
     
+    // Allow clicking anywhere to re-lock pointer if unlocked during gameplay
+    document.addEventListener('click', () => {
+      if (stateManager.getState() === GameState.PLAYING && !this.player.input.isMobile && !this.player.input.isLocked) {
+        this.player.lockPointer();
+      }
+    });
+    
     // Generate the initial level in the background so the canvas isn't black during main menu
     this.startNewGame(false, false);
     
@@ -206,7 +213,7 @@ export class Game {
       if (this.audioManager && this.audioManager.audioContext && this.audioManager.audioContext.state === 'suspended') {
         this.audioManager.audioContext.resume();
       }
-    } else {
+    } else if (newState !== GameState.LOADING) {
       this.player.unlockPointer();
     }
     
