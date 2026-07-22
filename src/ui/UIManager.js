@@ -59,9 +59,10 @@ export class UIManager {
         try { 
           const p = document.body.requestPointerLock(); 
           if (p) {
-             p.catch(() => {
+             p.catch(err => {
+                 console.warn("Pointer lock failed:", err);
                  const msg = this.currentLang === 'pt' ? 'Aguarde 1 segundo para voltar...' : 'Wait a second to resume...';
-                 this.showToast(msg);
+                 this.showNotification(msg);
              });
           }
         } catch(e) {}
